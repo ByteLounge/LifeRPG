@@ -3,35 +3,41 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Compass, Shield, User, Backpack, Store } from "lucide-react";
+import { soundEngine } from "@/lib/sound";
 
 const MOBILE_ITEMS = [
-  { href: "/dashboard", label: "Hub", icon: Compass },
-  { href: "/quests", label: "Quests", icon: Shield },
-  { href: "/character", label: "Hero", icon: User },
-  { href: "/inventory", label: "Bag", icon: Backpack },
-  { href: "/shop", label: "Shop", icon: Store },
+  { href: "/dashboard", label: "HUB", icon: "🗺️" },
+  { href: "/quests", label: "QUESTS", icon: "⚔️" },
+  { href: "/character", label: "HERO", icon: "🍄" },
+  { href: "/inventory", label: "BAG", icon: "🎒" },
+  { href: "/shop", label: "SHOP", icon: "🏰" },
 ];
 
 export function MobileNav() {
   const pathname = usePathname();
 
+  const handleClick = () => {
+    soundEngine.playJump();
+  };
+
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0c121e]/95 backdrop-blur-lg border-t border-slate-800 px-2 py-1.5 flex justify-around items-center select-none shadow-2xl">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#101018] border-t-4 border-black px-1 py-1.5 flex justify-around items-center select-none shadow-[0_-4px_0_0_#202030]">
       {MOBILE_ITEMS.map((item) => {
         const isActive = pathname === item.href;
-        const Icon = item.icon;
 
         return (
           <Link
             key={item.href}
             href={item.href}
-            className={`flex flex-col items-center justify-center w-14 py-1 rounded-xl text-xs transition-colors ${
-              isActive ? "text-amber-400 font-bold" : "text-slate-400 hover:text-slate-200"
+            onClick={handleClick}
+            className={`flex flex-col items-center justify-center w-16 py-1 border-2 border-black font-pixel transition-all ${
+              isActive
+                ? "bg-[#FBD000] text-black shadow-[2px_2px_0_#000] -translate-y-1"
+                : "bg-[#202030] text-white hover:bg-[#303040]"
             }`}
           >
-            <Icon className={`w-5 h-5 mb-0.5 ${isActive ? "text-amber-400" : "text-slate-400"}`} />
-            <span className="text-[10px] tracking-tight">{item.label}</span>
+            <span className="text-base leading-none mb-1">{item.icon}</span>
+            <span className="text-[8px] font-bold tracking-tight">{item.label}</span>
           </Link>
         );
       })}

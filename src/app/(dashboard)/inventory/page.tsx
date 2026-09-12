@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Backpack, Sparkles, Check, Store, Shield, Tag } from "lucide-react";
 import { useGame } from "@/components/providers/GameProvider";
 import { DomainUserInventory } from "@/server/repositories/types";
+import { soundEngine } from "@/lib/sound";
 
 export default function InventoryPage() {
   const { refreshGameData, setTheme } = useGame();
@@ -36,6 +37,11 @@ export default function InventoryPage() {
     setEquippingId(item.id);
 
     const newEquippedState = !item.isEquipped;
+    if (newEquippedState) {
+      soundEngine.playPowerUp();
+    } else {
+      soundEngine.playPause();
+    }
 
     try {
       const res = await fetch("/api/inventory/equip", {
@@ -55,7 +61,7 @@ export default function InventoryPage() {
         await refreshGameData();
       }
     } catch {
-      // ignore
+      soundEngine.playPowerDown();
     } finally {
       setEquippingId(null);
     }
@@ -68,23 +74,30 @@ export default function InventoryPage() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* Header Banner - SMB3 Item Tray */}
+      <div className="pixel-box-gold p-4 md:p-6 text-slate-950 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black font-serif text-white tracking-wide flex items-center gap-2.5">
-            <Backpack className="w-6 h-6 text-amber-400" />
-            <span>Adventurer&apos;s Backpack</span>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="font-pixel text-[9px] bg-red-600 text-white px-2 py-0.5 border border-black">
+              SMB3 INVENTORY
+            </span>
+            <span className="font-pixel text-[9px] text-yellow-900">ITEM RESERVE TRAY</span>
+          </div>
+          <h1 className="font-pixel text-base sm:text-xl text-yellow-950 tracking-wider">
+            HERO BACKPACK & ITEMS
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
-            Manage your owned frames, honorary titles, and realm themes.
+          <p className="font-retro text-xs text-yellow-900 mt-1">
+            Manage your equipped badges, power titles, and Mushroom Kingdom realm themes!
           </p>
         </div>
 
         <Link
           href="/shop"
-          className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 border border-amber-500/30 font-semibold text-xs flex items-center gap-2 transition-colors w-fit"
+          onClick={() => soundEngine.playJump()}
+          className="pixel-btn pixel-btn-red font-pixel text-[10px] px-4 py-2.5 flex items-center gap-2 shrink-0 self-start sm:self-auto"
         >
-          <Store className="w-4 h-4" />
-          <span>Visit Bazaar Shop</span>
+          <span>🏪</span>
+          <span>VISIT TOAD SHOP</span>
         </Link>
       </div>
 
@@ -93,46 +106,53 @@ export default function InventoryPage() {
         {["ALL", "AVATAR_FRAME", "TITLE", "THEME", "BADGE"].map((type) => (
           <button
             key={type}
-            onClick={() => setFilterType(type)}
-            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors ${
+            onClick={() => {
+              soundEngine.playPause();
+              setFilterType(type);
+            }}
+            className={`font-pixel text-[9px] px-3 py-2 border-2 transition-all ${
               filterType === type
-                ? "bg-amber-500 text-slate-950 shadow-sm"
-                : "bg-slate-900 border border-slate-800 text-slate-400 hover:text-white"
+                ? "bg-yellow-400 text-slate-950 border-black shadow-[3px_3px_0px_#000]"
+                : "bg-slate-900 text-slate-400 border-slate-700 hover:text-white hover:border-yellow-400"
             }`}
           >
             {type === "ALL"
-              ? "All Items"
+              ? "★ ALL ITEMS"
               : type === "AVATAR_FRAME"
-              ? "Avatar Frames"
+              ? "🖼️ FRAMES"
               : type === "TITLE"
-              ? "Titles"
+              ? "👑 TITLES"
               : type === "THEME"
-              ? "Themes"
-              : "Badges"}
+              ? "🎨 REALMS"
+              : "⭐ BADGES"}
           </button>
         ))}
       </div>
 
-      {/* Items Grid */}
+      {/* Items Grid (SMB3 Style Item Slots) */}
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-40 rounded-2xl bg-slate-900/60 animate-pulse border border-slate-800" />
+            <div key={i} className="h-44 pixel-box bg-slate-900 animate-pulse border-2 border-slate-800" />
           ))}
         </div>
       ) : filteredItems.length === 0 ? (
-        <div className="p-12 rounded-2xl bg-slate-900/40 border border-dashed border-slate-800 text-center space-y-3">
-          <Backpack className="w-10 h-10 text-slate-600 mx-auto" />
-          <h3 className="text-base font-bold text-slate-300">Your inventory is empty</h3>
-          <p className="text-xs text-slate-500 max-w-sm mx-auto">
-            Acquire cosmetic items, avatar frames, and honorary titles in the virtual shop using your earned gold.
+        <div className="pixel-box p-12 bg-[#181824] border-2 border-dashed border-slate-700 text-center space-y-4">
+          <div className="w-14 h-14 mx-auto question-block flex items-center justify-center font-pixel text-xl text-yellow-950">
+            ?
+          </div>
+          <h3 className="font-pixel text-sm text-yellow-400">ITEM RESERVE TRAY IS EMPTY!</h3>
+          <p className="text-xs text-slate-400 max-w-sm mx-auto font-retro">
+            Acquire cosmetic badges, avatar frames, and honorary titles in Toad&apos;s Item Shop using your
+            earned gold coins.
           </p>
           <Link
             href="/shop"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs tracking-wide shadow-md shadow-amber-500/20 transition-all"
+            onClick={() => soundEngine.playCoin()}
+            className="pixel-btn pixel-btn-yellow font-pixel text-[10px] px-4 py-2.5 inline-flex items-center gap-2"
           >
-            <Store className="w-4 h-4" />
-            <span>Open Shop Catalog</span>
+            <span>🪙</span>
+            <span>OPEN TOAD&apos;S SHOP</span>
           </Link>
         </div>
       ) : (
@@ -140,49 +160,58 @@ export default function InventoryPage() {
           {filteredItems.map((inv) => (
             <div
               key={inv.id}
-              className={`p-5 rounded-2xl border transition-all flex flex-col justify-between gap-4 ${
+              className={`pixel-box p-5 flex flex-col justify-between gap-4 transition-all ${
                 inv.isEquipped
-                  ? "bg-slate-900 border-amber-500/60 shadow-rpg-gold"
-                  : "bg-[#111827] border-slate-800 hover:border-slate-700"
+                  ? "bg-[#1f2937] border-2 border-yellow-400 shadow-[4px_4px_0px_#eab308]"
+                  : "bg-[#181824] border-2 border-slate-700 hover:border-slate-500"
               }`}
             >
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-2xl">{inv.item.icon}</span>
-                  <span
-                    className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${
-                      inv.item.rarity === "COMMON"
-                        ? "bg-slate-800 text-slate-400"
-                        : inv.item.rarity === "RARE"
-                        ? "bg-blue-500/15 text-blue-400"
-                        : inv.item.rarity === "EPIC"
-                        ? "bg-purple-500/15 text-purple-400"
-                        : "bg-amber-500/15 text-amber-400"
-                    }`}
-                  >
-                    {inv.item.rarity}
-                  </span>
+                  <span className="text-3xl select-none">{inv.item.icon}</span>
+                  <div className="flex items-center gap-1.5">
+                    {inv.isEquipped && (
+                      <span className="font-pixel text-[8px] bg-yellow-400 text-slate-950 px-1.5 py-0.5 border border-black animate-pulse">
+                        ★ EQUIPPED
+                      </span>
+                    )}
+                    <span
+                      className={`font-pixel text-[8px] uppercase px-1.5 py-0.5 border ${
+                        inv.item.rarity === "COMMON"
+                          ? "bg-slate-800 text-slate-300 border-slate-600"
+                          : inv.item.rarity === "RARE"
+                          ? "bg-blue-900/60 text-blue-300 border-blue-500"
+                          : inv.item.rarity === "EPIC"
+                          ? "bg-purple-900/60 text-purple-300 border-purple-500"
+                          : "bg-amber-900/60 text-yellow-300 border-amber-500"
+                      }`}
+                    >
+                      {inv.item.rarity}
+                    </span>
+                  </div>
                 </div>
 
-                <h3 className="text-base font-bold text-white mb-1">{inv.item.name}</h3>
-                <p className="text-xs text-slate-400 line-clamp-2">{inv.item.description}</p>
+                <h3 className="font-pixel text-xs text-white mb-1.5">{inv.item.name}</h3>
+                <p className="font-retro text-xs text-slate-300 line-clamp-2 leading-relaxed">
+                  {inv.item.description}
+                </p>
               </div>
 
-              <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between">
-                <span className="text-[11px] text-slate-500 uppercase font-mono">
+              <div className="pt-3 border-t-2 border-slate-700 flex items-center justify-between">
+                <span className="font-pixel text-[8px] text-yellow-500 uppercase">
                   {inv.item.type.replace("_", " ")}
                 </span>
 
                 <button
                   onClick={() => handleToggleEquip(inv)}
                   disabled={equippingId === inv.id}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  className={`pixel-btn font-pixel text-[9px] px-3 py-1.5 ${
                     inv.isEquipped
-                      ? "bg-amber-500/20 text-amber-400 border border-amber-500/40 hover:bg-rose-500/20 hover:text-rose-400 hover:border-rose-500/40"
-                      : "bg-slate-800 hover:bg-slate-750 text-slate-200 border border-slate-700"
+                      ? "pixel-btn-red text-white"
+                      : "pixel-btn-green text-white"
                   }`}
                 >
-                  {inv.isEquipped ? "Equipped (Click to Unequip)" : "Equip"}
+                  {inv.isEquipped ? "UNEQUIP" : "EQUIP ITEM"}
                 </button>
               </div>
             </div>

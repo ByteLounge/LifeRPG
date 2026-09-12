@@ -1,19 +1,7 @@
 import type { Metadata } from "next";
-import { Inter, Cinzel } from "next/font/google";
 import "./globals.css";
 import { GameProvider } from "@/components/providers/GameProvider";
 import { AppShell } from "@/components/layout/AppShell";
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-});
-
-const cinzel = Cinzel({
-  subsets: ["latin"],
-  variable: "--font-cinzel",
-  weight: ["600", "700", "800", "900"],
-});
 
 export const metadata: Metadata = {
   title: "Life RPG — Gamified Real-World Productivity",
@@ -34,8 +22,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`dark ${inter.variable} ${cinzel.variable}`}>
-      <body className="bg-[#0B0F17] text-slate-100 min-h-screen antialiased selection:bg-amber-500 selection:text-slate-950">
+    <html lang="en" className="dark">
+      <body className="bg-[#0B0F17] text-slate-100 min-h-screen antialiased selection:bg-amber-500 selection:text-slate-950 font-sans">
         <GameProvider>
           <AppShell>{children}</AppShell>
         </GameProvider>

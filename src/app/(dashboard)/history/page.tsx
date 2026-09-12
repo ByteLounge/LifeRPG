@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { History, Shield, Sparkles, Coins, Trophy, ShoppingBag, CheckCircle2 } from "lucide-react";
 import { formatDateTime } from "@/lib/utils";
+import { soundEngine } from "@/lib/sound";
 
 interface ActivityItem {
   id: string;
@@ -16,11 +17,12 @@ interface ActivityItem {
 
 export default function HistoryPage() {
   const [ledger, setLedger] = useState<ActivityItem[]>([]);
+  const [filter, setFilter] = useState<string>("ALL");
   const [loading, setLoading] = useState(true);
 
   const fetchLedger = useCallback(async () => {
     try {
-      const res = await fetch("/api/history?limit=30");
+      const res = await fetch("/api/history?limit=40");
       if (res.ok) {
         const json = await res.json();
         if (json.success) setLedger(json.data);
@@ -36,75 +38,120 @@ export default function HistoryPage() {
     fetchLedger();
   }, [fetchLedger]);
 
+  const filteredLedger = ledger.filter((item) => {
+    if (filter === "ALL") return true;
+    return item.type === filter;
+  });
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-black font-serif text-white tracking-wide flex items-center gap-2.5">
-          <History className="w-6 h-6 text-amber-400" />
-          <span>Chronicles & Audit Ledger</span>
-        </h1>
-        <p className="text-xs text-slate-400 mt-1">
-          Authoritative chronological record of all quest milestones, XP growth, and treasury debits.
-        </p>
+      {/* 8-bit NES Arcade Chronicle Header */}
+      <div className="pixel-box-green p-4 md:p-6 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="font-pixel text-[9px] bg-yellow-400 text-slate-950 px-2 py-0.5 border border-black font-bold">
+              ARCADE LEDGER
+            </span>
+            <span className="font-pixel text-[9px] text-emerald-200">WORLD CHRONICLES</span>
+          </div>
+          <h1 className="font-pixel text-base sm:text-xl text-yellow-300 tracking-wider">
+            HIGH-SCORE AUDIT & LOG
+          </h1>
+          <p className="font-retro text-xs text-emerald-100 mt-1">
+            Authoritative chronological record of all quest completions, 1-UPs, and bazaar trades.
+          </p>
+        </div>
+
+        <div className="font-pixel text-xs bg-emerald-950 px-3 py-2 border-2 border-emerald-400 text-emerald-300 w-fit">
+          {ledger.length} ENTRIES RECORDED
+        </div>
+      </div>
+
+      {/* Filter Tabs */}
+      <div className="flex flex-wrap gap-2">
+        {[
+          { id: "ALL", label: "★ ALL EVENTS" },
+          { id: "QUEST_COMPLETED", label: "🚩 QUESTS" },
+          { id: "LEVEL_UP", label: "🍄 1-UPs" },
+          { id: "ACHIEVEMENT_UNLOCKED", label: "⭐ STARS" },
+          { id: "SHOP_PURCHASE", label: "🏪 SHOP" },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => {
+              soundEngine.playPause();
+              setFilter(tab.id);
+            }}
+            className={`font-pixel text-[9px] px-3 py-2 border-2 transition-all ${
+              filter === tab.id
+                ? "bg-yellow-400 text-slate-950 border-black shadow-[3px_3px_0px_#000]"
+                : "bg-slate-900 text-slate-400 border-slate-700 hover:text-white hover:border-yellow-400"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       {loading ? (
         <div className="space-y-3">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-16 rounded-xl bg-slate-900/60 animate-pulse border border-slate-800" />
+            <div key={i} className="h-16 pixel-box bg-slate-900 animate-pulse border-2 border-slate-800" />
           ))}
         </div>
-      ) : ledger.length === 0 ? (
-        <div className="p-12 rounded-2xl bg-slate-900/40 border border-dashed border-slate-800 text-center space-y-3">
-          <History className="w-10 h-10 text-slate-600 mx-auto" />
-          <h3 className="text-base font-bold text-slate-300">Your chronicles have just begun</h3>
-          <p className="text-xs text-slate-500 max-w-sm mx-auto">
-            As you fulfill trials, level up, and trade at the bazaar, your ledger will record every milestone.
+      ) : filteredLedger.length === 0 ? (
+        <div className="pixel-box p-12 bg-[#181824] border-2 border-dashed border-slate-700 text-center space-y-3">
+          <div className="text-3xl">📜</div>
+          <h3 className="font-pixel text-sm text-yellow-400">NO CHRONICLE ENTRIES YET!</h3>
+          <p className="font-retro text-xs text-slate-400 max-w-sm mx-auto">
+            As you fulfill quest trials, level up, and trade at Toad&apos;s shop, your ledger will record
+            every milestone.
           </p>
         </div>
       ) : (
         <div className="space-y-3">
-          {ledger.map((item) => (
+          {filteredLedger.map((item) => (
             <div
               key={item.id}
-              className="p-4 rounded-xl bg-[#111827] border border-slate-800 flex items-center justify-between gap-4 shadow-sm hover:border-slate-700 transition-colors"
+              onClick={() => soundEngine.playPause()}
+              className="pixel-box p-4 bg-[#181824] border-2 border-slate-700 flex items-center justify-between gap-4 cursor-pointer hover:border-yellow-400 transition-all select-none"
             >
               <div className="flex items-center gap-3.5">
+                {/* 8-bit Icon Badge */}
                 <div
-                  className={`w-9 h-9 rounded-xl flex items-center justify-center text-base border shrink-0 ${
+                  className={`w-10 h-10 border-2 border-black flex items-center justify-center text-lg shrink-0 ${
                     item.type === "QUEST_COMPLETED"
-                      ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+                      ? "bg-emerald-500 text-white"
                       : item.type === "LEVEL_UP"
-                      ? "bg-amber-500/15 border-amber-500/40 text-amber-400"
+                      ? "bg-red-500 text-white"
                       : item.type === "ACHIEVEMENT_UNLOCKED"
-                      ? "bg-purple-500/15 border-purple-500/40 text-purple-400"
-                      : "bg-sky-500/10 border-sky-500/30 text-sky-400"
+                      ? "bg-yellow-400 text-slate-950"
+                      : "bg-sky-500 text-white"
                   }`}
                 >
-                  {item.type === "QUEST_COMPLETED" ? (
-                    <CheckCircle2 className="w-4 h-4" />
-                  ) : item.type === "LEVEL_UP" ? (
-                    <Sparkles className="w-4 h-4" />
-                  ) : item.type === "ACHIEVEMENT_UNLOCKED" ? (
-                    <Trophy className="w-4 h-4" />
-                  ) : (
-                    <ShoppingBag className="w-4 h-4" />
-                  )}
+                  {item.type === "QUEST_COMPLETED"
+                    ? "🚩"
+                    : item.type === "LEVEL_UP"
+                    ? "🍄"
+                    : item.type === "ACHIEVEMENT_UNLOCKED"
+                    ? "⭐"
+                    : "🪙"}
                 </div>
 
                 <div>
-                  <h4 className="text-sm font-bold text-white">{item.title}</h4>
-                  <p className="text-xs text-slate-400">{item.description}</p>
+                  <h4 className="font-pixel text-xs text-white tracking-wide">{item.title}</h4>
+                  <p className="font-retro text-xs text-slate-300 mt-0.5">{item.description}</p>
                 </div>
               </div>
 
               <div className="text-right shrink-0">
-                <div className="text-[11px] text-slate-500 font-mono">
+                <div className="font-pixel text-[9px] text-slate-400">
                   {formatDateTime(item.timestamp)}
                 </div>
                 {item.xpEarned && item.xpEarned > 0 && (
-                  <div className="text-xs font-mono font-bold text-sky-400">+{item.xpEarned} XP</div>
+                  <div className="font-pixel text-[10px] text-yellow-400 mt-0.5">
+                    +{item.xpEarned} XP
+                  </div>
                 )}
               </div>
             </div>

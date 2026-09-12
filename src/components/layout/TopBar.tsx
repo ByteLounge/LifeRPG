@@ -1,78 +1,80 @@
 "use client";
 
 import React from "react";
-import { Flame, Coins, Volume2, VolumeX, Shield } from "lucide-react";
 import { useGame } from "@/components/providers/GameProvider";
 import { formatNumber } from "@/lib/utils";
+import { soundEngine } from "@/lib/sound";
 
 export function TopBar() {
   const { character, streak, xpProgress, soundEnabled, setSoundEnabled } = useGame();
 
   if (!character) return null;
 
+  const toggleSound = () => {
+    const next = !soundEnabled;
+    setSoundEnabled(next);
+    if (next) soundEngine.playCoin();
+  };
+
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between px-4 md:px-8 py-3 bg-[#0c121e]/90 backdrop-blur-md border-b border-slate-800 text-slate-100">
-      {/* Level & XP Progression */}
-      <div className="flex items-center gap-3 md:gap-4 flex-1 max-w-md">
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 font-serif font-black text-sm">
-          <Shield className="w-4 h-4 text-amber-400 shrink-0" />
-          <span>LVL {character.level}</span>
+    <header className="sticky top-0 z-30 bg-[#000000] border-b-4 border-[#000000] text-white px-4 md:px-8 py-3 shadow-[0_4px_0_0_#202030]">
+      <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4 font-pixel text-[11px] md:text-xs">
+        {/* Mario-style Hero Header & Level */}
+        <div className="flex items-center gap-4">
+          <div className="flex flex-col">
+            <span className="text-[#E52521] uppercase text-[9px] md:text-[10px] tracking-wider">HERO</span>
+            <span className="text-white font-bold truncate max-w-[120px] md:max-w-[160px]">
+              {character.name.toUpperCase()}
+            </span>
+          </div>
+
+          <div className="flex flex-col">
+            <span className="text-[#5C94FC] uppercase text-[9px] md:text-[10px] tracking-wider">STAGE</span>
+            <span className="text-[#FBD000] font-bold">LVL {String(character.level).padStart(2, "0")}</span>
+          </div>
         </div>
 
+        {/* 8-bit Pixel XP Bar */}
         {xpProgress && (
-          <div className="flex-1 min-w-[120px] max-w-[240px]">
-            <div className="flex justify-between text-[11px] text-slate-400 mb-1 font-mono">
-              <span className="text-sky-400 font-semibold">{xpProgress.currentProgressXP} XP</span>
-              <span>{xpProgress.xpNeededForNextLevel} XP</span>
+          <div className="flex-1 max-w-xs min-w-[160px] hidden sm:block">
+            <div className="flex justify-between text-[9px] text-[#A0A0B0] mb-1">
+              <span>XP {xpProgress.currentProgressXP}/{xpProgress.xpNeededForNextLevel}</span>
+              <span className="text-[#5C94FC]">{xpProgress.percentage}%</span>
             </div>
-            <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden p-0.5 border border-slate-700/50">
-              <div
-                className="h-full bg-gradient-to-r from-sky-500 to-blue-500 rounded-full transition-all duration-500 shadow-rpg-glow"
-                style={{ width: `${xpProgress.percentage}%` }}
-              />
+            <div className="pixel-bar-container">
+              <div className="pixel-bar-fill" style={{ width: `${xpProgress.percentage}%` }} />
             </div>
           </div>
         )}
-      </div>
 
-      {/* Economy, Streak & Audio Controls */}
-      <div className="flex items-center gap-3 md:gap-5">
-        {/* Streak Flame */}
-        <div
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-sm font-semibold"
-          title={`Current Streak: ${streak?.currentStreak || 0} days | Longest: ${streak?.longestStreak || 0} days`}
-        >
-          <Flame
-            className={`w-4 h-4 ${
-              (streak?.currentStreak || 0) > 0
-                ? "text-orange-500 fill-orange-500 animate-pulse"
-                : "text-slate-500"
-            }`}
-          />
-          <span className={(streak?.currentStreak || 0) > 0 ? "text-orange-400 font-bold" : "text-slate-400"}>
-            {streak?.currentStreak || 0}d
-          </span>
+        {/* Arcade HUD: Coins, Streak & Audio */}
+        <div className="flex items-center gap-4 md:gap-6">
+          {/* Animated Coin Counter */}
+          <div className="flex items-center gap-1.5 bg-[#202030] px-2.5 py-1.5 border-2 border-black shadow-[0_2px_0_#000]">
+            <span className="pixel-coin-spin text-base">🪙</span>
+            <span className="text-[#FBD000] font-bold tracking-widest">
+              x{String(character.gold).padStart(3, "0")}
+            </span>
+          </div>
+
+          {/* Daily Streak Fireball */}
+          <div className="flex items-center gap-1.5 bg-[#202030] px-2.5 py-1.5 border-2 border-black shadow-[0_2px_0_#000]">
+            <span className="text-sm">🔥</span>
+            <span className="text-[#E52521] font-bold">
+              {String(streak?.currentStreak || 0).padStart(2, "0")}D
+            </span>
+          </div>
+
+          {/* Retro Audio Toggle */}
+          <button
+            onClick={toggleSound}
+            className={`pixel-btn ${soundEnabled ? "pixel-btn-green" : "pixel-btn-dark"} text-[9px] py-1.5 px-2.5`}
+            title="Toggle 8-bit Chiptune Audio"
+            aria-label="Toggle sound"
+          >
+            {soundEnabled ? "SFX:ON" : "SFX:OFF"}
+          </button>
         </div>
-
-        {/* Gold Treasury */}
-        <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-500/10 border border-amber-500/25 text-amber-300 font-semibold text-sm shadow-sm">
-          <Coins className="w-4 h-4 text-amber-400" />
-          <span>{formatNumber(character.gold)}</span>
-        </div>
-
-        {/* Sound Toggle */}
-        <button
-          onClick={() => setSoundEnabled(!soundEnabled)}
-          className={`p-2 rounded-lg border transition-colors ${
-            soundEnabled
-              ? "bg-sky-500/10 border-sky-500/30 text-sky-400"
-              : "bg-slate-900 border-slate-800 text-slate-500 hover:text-slate-300"
-          }`}
-          title={soundEnabled ? "Mute Game Audio" : "Enable Retro RPG Audio"}
-          aria-label="Toggle game audio"
-        >
-          {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-        </button>
       </div>
     </header>
   );

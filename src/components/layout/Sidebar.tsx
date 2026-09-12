@@ -3,101 +3,98 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Shield,
-  Compass,
-  User,
-  Backpack,
-  Store,
-  Trophy,
-  History,
-  Settings,
-  Sparkles,
-  LogOut,
-} from "lucide-react";
 import { useGame } from "@/components/providers/GameProvider";
 import { useRouter } from "next/navigation";
+import { soundEngine } from "@/lib/sound";
 
 const NAV_ITEMS = [
-  { href: "/dashboard", label: "Command Center", icon: Compass },
-  { href: "/quests", label: "Quest Journal", icon: Shield },
-  { href: "/character", label: "Character Sheet", icon: User },
-  { href: "/inventory", label: "Inventory", icon: Backpack },
-  { href: "/shop", label: "Bazaar & Shop", icon: Store },
-  { href: "/achievements", label: "Achievements", icon: Trophy },
-  { href: "/history", label: "Audit Ledger", icon: History },
-  { href: "/settings", label: "Settings", icon: Settings },
+  { href: "/dashboard", label: "OVERWORLD", icon: "🗺️" },
+  { href: "/quests", label: "TRIALS & QUESTS", icon: "⚔️" },
+  { href: "/character", label: "HERO STATUS", icon: "🍄" },
+  { href: "/inventory", label: "ITEM BAG", icon: "🎒" },
+  { href: "/shop", label: "TOAD'S SHOP", icon: "🏰" },
+  { href: "/achievements", label: "STAR MEDALS", icon: "⭐" },
+  { href: "/history", label: "CHRONICLE", icon: "📜" },
+  { href: "/settings", label: "SETTINGS", icon: "⚙️" },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { character, profile } = useGame();
+  const { character } = useGame();
   const router = useRouter();
 
+  const handleNavClick = () => {
+    soundEngine.playJump();
+  };
+
   const handleLogout = async () => {
+    soundEngine.playJump();
     await fetch("/api/auth/logout", { method: "POST" });
     router.push("/login");
   };
 
   return (
-    <aside className="hidden md:flex flex-col w-64 border-r border-slate-800 bg-[#0c121e] text-slate-200 select-none shrink-0 h-screen sticky top-0">
-      {/* Brand & Logo */}
-      <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-800/80">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-slate-950 font-black shadow-rpg-gold">
-          <Sparkles className="w-5 h-5 text-slate-950" />
+    <aside className="hidden md:flex flex-col w-64 bg-[#101018] border-r-4 border-black text-white select-none shrink-0 h-screen sticky top-0 shadow-[4px_0_0_0_#202030]">
+      {/* 2D Mario Logo Banner */}
+      <div className="p-5 border-b-4 border-black bg-[#E52521] text-center shadow-[inset_0_-4px_0_#A01010]">
+        <div className="inline-block bg-[#FBD000] border-2 border-black px-2 py-0.5 mb-1 shadow-[2px_2px_0_#000]">
+          <span className="font-pixel text-[9px] text-black font-black">SUPER</span>
         </div>
-        <div>
-          <h1 className="font-serif font-black tracking-wider text-base text-white">LIFE RPG</h1>
-          <p className="text-[11px] text-amber-400 font-medium tracking-wide">FORGED PRODUCTIVITY</p>
+        <h1 className="font-pixel text-base font-black text-white tracking-widest drop-shadow-[2px_2px_0_#000]">
+          LIFE RPG
+        </h1>
+        <div className="text-[8px] font-pixel text-[#FBD000] mt-1 tracking-wider">
+          ★ LEVEL UP YOUR LIFE ★
         </div>
       </div>
 
-      {/* User Hero Mini-Badge */}
+      {/* Hero Badge Styled Like Question Block */}
       {character && (
-        <div className="mx-4 my-4 p-3 rounded-xl bg-slate-900/90 border border-slate-800/80 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-slate-800 border border-amber-500/40 flex items-center justify-center text-lg font-bold text-amber-400">
-            ⚔️
-          </div>
-          <div className="overflow-hidden">
-            <div className="text-sm font-bold text-slate-100 truncate">{character.name}</div>
-            <div className="text-xs text-slate-400">
-              Level <span className="text-amber-400 font-semibold">{character.level}</span> Hero
+        <div className="m-3 p-3 question-block text-black">
+          <div className="flex items-center gap-2.5 font-pixel">
+            <div className="w-8 h-8 bg-black text-white flex items-center justify-center text-sm border-2 border-white">
+              👑
+            </div>
+            <div className="overflow-hidden">
+              <div className="text-[10px] font-black truncate">{character.name.toUpperCase()}</div>
+              <div className="text-[9px] font-bold text-[#884400]">
+                LEVEL {character.level} HERO
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Navigation Links */}
-      <nav className="flex-1 px-3 py-2 space-y-1 overflow-y-auto">
+      {/* Retro Pixel Navigation Menu */}
+      <nav className="flex-1 px-3 py-2 space-y-2 overflow-y-auto">
         {NAV_ITEMS.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
-          const Icon = item.icon;
 
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+              onClick={handleNavClick}
+              className={`flex items-center gap-3 px-3 py-2.5 font-pixel text-[10px] transition-all border-2 border-black ${
                 isActive
-                  ? "bg-amber-500/15 text-amber-300 border border-amber-500/30 shadow-sm"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-850"
+                  ? "bg-[#5C94FC] text-black shadow-[3px_3px_0_#000] translate-x-1"
+                  : "bg-[#202030] text-white hover:bg-[#303048] shadow-[2px_2px_0_#000]"
               }`}
             >
-              <Icon className={`w-4 h-4 ${isActive ? "text-amber-400" : "text-slate-400"}`} />
-              <span>{item.label}</span>
+              <span className="text-sm">{item.icon}</span>
+              <span className="truncate">{item.label}</span>
             </Link>
           );
         })}
       </nav>
 
-      {/* Footer / Logout */}
-      <div className="p-4 border-t border-slate-800/80">
+      {/* Warp Pipe / Exit Realm */}
+      <div className="p-3 border-t-4 border-black bg-[#181820]">
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 w-full px-3 py-2 text-sm font-medium text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
+          className="pixel-btn pixel-btn-red w-full text-[9px] py-2"
         >
-          <LogOut className="w-4 h-4" />
-          <span>Exit Realm</span>
+          <span>🚪 EXIT REALM</span>
         </button>
       </div>
     </aside>

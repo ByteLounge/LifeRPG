@@ -2,7 +2,6 @@
 
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle2, AlertCircle, Info } from "lucide-react";
 import { useGame } from "@/components/providers/GameProvider";
 
 export function ToastNotification() {
@@ -11,24 +10,24 @@ export function ToastNotification() {
   if (!toastMessage) return null;
 
   return (
-    <div className="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-50 pointer-events-none">
+    <div className="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-50 pointer-events-none font-pixel">
       <AnimatePresence>
         <motion.div
-          initial={{ opacity: 0, y: 20, scale: 0.9 }}
+          initial={{ opacity: 0, y: 20, scale: 0.8 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 20, scale: 0.9 }}
-          className={`flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl border text-sm font-medium backdrop-blur-md ${
+          exit={{ opacity: 0, y: 20, scale: 0.8 }}
+          className={`flex items-center gap-3 px-4 py-3 border-4 border-black text-[10px] tracking-wide shadow-[0_6px_0_0_#000] ${
             toastMessage.type === "success"
-              ? "bg-slate-900/95 border-emerald-500/50 text-emerald-300 shadow-emerald-500/10"
+              ? "bg-[#00A800] text-white"
               : toastMessage.type === "error"
-              ? "bg-slate-900/95 border-rose-500/50 text-rose-300 shadow-rose-500/10"
-              : "bg-slate-900/95 border-sky-500/50 text-sky-300 shadow-sky-500/10"
+              ? "bg-[#E52521] text-white"
+              : "bg-[#5C94FC] text-black"
           }`}
         >
-          {toastMessage.type === "success" && <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />}
-          {toastMessage.type === "error" && <AlertCircle className="w-5 h-5 text-rose-400 shrink-0" />}
-          {toastMessage.type === "info" && <Info className="w-5 h-5 text-sky-400 shrink-0" />}
-          <span>{toastMessage.text}</span>
+          <span className="text-sm">
+            {toastMessage.type === "success" ? "🍄" : toastMessage.type === "error" ? "💥" : "⭐"}
+          </span>
+          <span className="font-bold">{toastMessage.text.toUpperCase()}</span>
         </motion.div>
       </AnimatePresence>
     </div>

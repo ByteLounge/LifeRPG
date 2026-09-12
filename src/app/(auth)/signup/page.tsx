@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Sparkles, Loader2, AlertCircle, Mail, KeyRound, User } from "lucide-react";
 import { useGame } from "@/components/providers/GameProvider";
+import { soundEngine } from "@/lib/sound";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -19,6 +20,7 @@ export default function SignupPage() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    soundEngine.playCoin();
     setLoading(true);
     setError(null);
 
@@ -37,13 +39,16 @@ export default function SignupPage() {
 
       const json = await res.json();
       if (!res.ok || !json.success) {
+        soundEngine.playPowerDown();
         setError(json.error?.message || "Registration failed.");
         return;
       }
 
+      soundEngine.playLevelUp();
       await refreshGameData();
       router.push("/onboarding");
     } catch {
+      soundEngine.playPowerDown();
       setError("Network failure. Please check your connection.");
     } finally {
       setLoading(false);
@@ -52,27 +57,34 @@ export default function SignupPage() {
 
   return (
     <div className="flex-1 flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md p-8 rounded-2xl bg-[#111827] border border-slate-800 shadow-2xl">
+      <div className="w-full max-w-md pixel-box p-8 bg-[#181824] border-2 border-yellow-400 shadow-[6px_6px_0px_#eab308]">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-amber-700 items-center justify-center text-slate-950 font-black mb-3 shadow-rpg-gold">
-            <Sparkles className="w-6 h-6 text-slate-950" />
+        <div className="text-center mb-8 space-y-2">
+          <div className="inline-flex w-14 h-14 pixel-box-mario items-center justify-center text-3xl mb-1 shadow-md">
+            🍄
           </div>
-          <h2 className="text-2xl font-black font-serif text-white tracking-wide">Forge Your Legend</h2>
-          <p className="text-sm text-slate-400 mt-1">Begin your quest for real-world mastery</p>
+          <div className="font-pixel text-[10px] text-yellow-400 tracking-wider">
+            ★ NEW GAME CARTRIDGE ★
+          </div>
+          <h2 className="font-pixel text-lg sm:text-xl text-white tracking-wide">
+            FORGE YOUR HERO
+          </h2>
+          <p className="font-retro text-xs text-slate-400">
+            Calibrate your real-world discipline into an 8-bit legend!
+          </p>
         </div>
 
         {error && (
-          <div className="mb-6 p-3.5 rounded-xl bg-rose-950/40 border border-rose-800/60 text-rose-300 text-sm flex items-center gap-2.5">
-            <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+          <div className="mb-6 p-3.5 pixel-box bg-red-950/80 border-2 border-red-500 text-red-200 text-xs font-retro flex items-center gap-2.5">
+            <span className="text-base">⚠️</span>
             <span>{error}</span>
           </div>
         )}
 
         <form onSubmit={handleSignup} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-              Player Name
+            <label className="block font-pixel text-[9px] text-yellow-400 uppercase tracking-wider mb-2">
+              PLAYER 1 HANDLE
             </label>
             <div className="relative">
               <User className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
@@ -84,31 +96,31 @@ export default function SignupPage() {
                   setDisplayName(e.target.value);
                   if (!characterName) setCharacterName(e.target.value);
                 }}
-                placeholder="Arthur Pendelton"
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-100 placeholder-slate-600 text-sm focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none"
+                placeholder="Mario Mario"
+                className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border-2 border-slate-700 text-white placeholder-slate-600 font-retro text-xs focus:border-yellow-400 outline-none"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-              Character Hero Title / Name
+            <label className="block font-pixel text-[9px] text-yellow-400 uppercase tracking-wider mb-2">
+              HERO TITLE / RPG MONIKER
             </label>
             <div className="relative">
-              <span className="text-sm absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500">⚔️</span>
+              <span className="text-sm absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500">⭐</span>
               <input
                 type="text"
                 value={characterName}
                 onChange={(e) => setCharacterName(e.target.value)}
-                placeholder="Arthur the Steadfast"
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-100 placeholder-slate-600 text-sm focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none"
+                placeholder="Mario the Unyielding"
+                className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border-2 border-slate-700 text-white placeholder-slate-600 font-retro text-xs focus:border-yellow-400 outline-none"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-              Email Address
+            <label className="block font-pixel text-[9px] text-yellow-400 uppercase tracking-wider mb-2">
+              PLAYER EMAIL
             </label>
             <div className="relative">
               <Mail className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
@@ -118,14 +130,14 @@ export default function SignupPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="hero@liferpg.io"
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-100 placeholder-slate-600 text-sm focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none"
+                className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border-2 border-slate-700 text-white placeholder-slate-600 font-retro text-xs focus:border-yellow-400 outline-none"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-              Password (Min. 8 characters)
+            <label className="block font-pixel text-[9px] text-yellow-400 uppercase tracking-wider mb-2">
+              SECRET PASSWORD (MIN 8 CHARACTERS)
             </label>
             <div className="relative">
               <KeyRound className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
@@ -136,7 +148,7 @@ export default function SignupPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-100 placeholder-slate-600 text-sm focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none"
+                className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border-2 border-slate-700 text-white placeholder-slate-600 font-retro text-xs focus:border-yellow-400 outline-none"
               />
             </div>
           </div>
@@ -144,16 +156,16 @@ export default function SignupPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-sm tracking-wide shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
+            className="pixel-btn pixel-btn-yellow w-full py-3 text-slate-950 font-pixel text-xs tracking-wider flex items-center justify-center gap-2 disabled:opacity-50"
           >
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Create Character & Enter"}
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "CREATE HERO & START GAME"}
           </button>
         </form>
 
-        <p className="text-center text-xs text-slate-400 mt-6">
-          Already have an account?{" "}
-          <Link href="/login" className="text-amber-400 font-bold hover:underline">
-            Sign in
+        <p className="text-center font-retro text-xs text-slate-400 mt-6">
+          Already have a saved game?{" "}
+          <Link href="/login" className="text-yellow-400 font-bold hover:underline">
+            Resume game
           </Link>
         </p>
       </div>

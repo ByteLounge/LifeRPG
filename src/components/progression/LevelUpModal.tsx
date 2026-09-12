@@ -2,107 +2,93 @@
 
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, Trophy, ArrowRight, X, Award } from "lucide-react";
 import { useGame } from "@/components/providers/GameProvider";
+import { soundEngine } from "@/lib/sound";
 
 export function LevelUpModal() {
   const { levelUpModalData, closeLevelUpModal } = useGame();
 
   if (!levelUpModalData) return null;
 
+  const handleClaim = () => {
+    soundEngine.playCoin();
+    closeLevelUpModal();
+  };
+
   return (
     <AnimatePresence>
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-xs"
         role="dialog"
         aria-modal="true"
         aria-labelledby="levelup-title"
       >
         <motion.div
-          initial={{ scale: 0.8, opacity: 0, y: 20 }}
+          initial={{ scale: 0.7, opacity: 0, y: 30 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
-          exit={{ scale: 0.8, opacity: 0, y: 20 }}
-          transition={{ type: "spring", stiffness: 350, damping: 25 }}
-          className="relative w-full max-w-md p-6 overflow-hidden rounded-2xl bg-[#111827] border-2 border-amber-500/80 shadow-[0_0_50px_rgba(245,158,11,0.4)] text-center text-slate-100"
+          exit={{ scale: 0.7, opacity: 0, y: 30 }}
+          transition={{ type: "spring", stiffness: 400, damping: 20 }}
+          className="relative w-full max-w-md p-6 bg-[#202030] border-4 border-black shadow-[inset_-6px_-6px_0px_0px_#101018,inset_6px_6px_0px_0px_#FBD000,0_10px_0px_0px_#000] text-center text-white font-pixel"
         >
-          {/* Close button */}
-          <button
-            onClick={closeLevelUpModal}
-            className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors focus-visible:ring-2 focus-visible:ring-amber-400"
-            aria-label="Close Level Up modal"
-          >
-            <X className="w-5 h-5" />
-          </button>
-
-          {/* Glowing Aura Accent */}
-          <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-48 h-48 bg-amber-500/20 rounded-full blur-3xl pointer-events-none" />
-
-          {/* Header Tag */}
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-400 text-xs font-semibold uppercase tracking-wider mb-3">
-            <Sparkles className="w-3.5 h-3.5 animate-pulse" />
-            Progression Milestone
+          {/* Top Banner Tag */}
+          <div className="inline-block bg-[#E52521] border-2 border-black px-3 py-1 text-[10px] text-white font-bold mb-4 shadow-[2px_2px_0_#000]">
+            ★ COURSE CLEAR! ★
           </div>
 
-          <h2 id="levelup-title" className="text-3xl font-black tracking-tight text-white font-serif mb-1">
+          <h2 id="levelup-title" className="text-2xl font-black text-[#FBD000] drop-shadow-[3px_3px_0_#000] mb-2">
             LEVEL UP!
           </h2>
-          <p className="text-sm text-slate-400 mb-6">
-            Your real-world discipline has ascended your character!
+
+          <p className="text-[10px] text-[#A0A0B0] mb-6 leading-relaxed">
+            SUPER DISCIPLINE HAS ASCENDED YOUR STATS!
           </p>
 
-          {/* Level Transition Visual */}
-          <div className="flex items-center justify-center gap-4 py-4 px-6 rounded-xl bg-slate-900/80 border border-slate-800 mb-6">
+          {/* Level Transition Box */}
+          <div className="flex items-center justify-center gap-4 py-4 px-4 bg-[#101018] border-4 border-black mb-6 shadow-[inset_0_4px_0_#000]">
             <div className="flex flex-col items-center">
-              <span className="text-xs uppercase text-slate-500 font-semibold">Previous</span>
-              <span className="text-2xl font-bold text-slate-400">Lvl {levelUpModalData.oldLevel}</span>
+              <span className="text-[9px] text-[#808090]">FROM</span>
+              <span className="text-lg font-bold text-white">LVL {levelUpModalData.oldLevel}</span>
             </div>
 
-            <motion.div
-              animate={{ x: [0, 5, 0] }}
-              transition={{ repeat: Infinity, duration: 1.5 }}
-              className="text-amber-400"
-            >
-              <ArrowRight className="w-6 h-6" />
-            </motion.div>
+            <span className="text-xl text-[#FBD000] animate-pulse">▶▶</span>
 
             <div className="flex flex-col items-center">
-              <span className="text-xs uppercase text-amber-400 font-semibold">Ascended</span>
-              <span className="text-3xl font-black text-amber-400 drop-shadow-[0_0_12px_rgba(245,158,11,0.5)]">
-                Lvl {levelUpModalData.newLevel}
+              <span className="text-[9px] text-[#FBD000]">ASCENDED</span>
+              <span className="text-2xl font-black text-[#00E800] drop-shadow-[2px_2px_0_#000]">
+                LVL {levelUpModalData.newLevel}
               </span>
             </div>
           </div>
 
-          {/* Rewards Received */}
-          <div className="space-y-2 text-left mb-6">
-            <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Rewards Granted</h4>
-            <div className="grid grid-cols-2 gap-2">
-              <div className="flex items-center gap-2 p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/50">
-                <span className="text-lg">✨</span>
+          {/* Spoil Rewards */}
+          <div className="space-y-3 text-left mb-6 font-pixel">
+            <div className="text-[9px] text-[#FBD000] uppercase">★ SPOILS AWARDED ★</div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-3 bg-[#181824] border-2 border-black flex items-center gap-2.5">
+                <span className="text-xl">✨</span>
                 <div>
-                  <div className="text-xs text-slate-400">Total XP Gained</div>
-                  <div className="text-sm font-bold text-sky-400">+{levelUpModalData.xpEarned} XP</div>
+                  <div className="text-[8px] text-[#808090]">EXP BONUS</div>
+                  <div className="text-[10px] text-[#5C94FC] font-bold">+{levelUpModalData.xpEarned} XP</div>
                 </div>
               </div>
-              <div className="flex items-center gap-2 p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/50">
-                <span className="text-lg">🪙</span>
+              <div className="p-3 bg-[#181824] border-2 border-black flex items-center gap-2.5">
+                <span className="text-xl pixel-coin-spin">🪙</span>
                 <div>
-                  <div className="text-xs text-slate-400">Gold Treasury</div>
-                  <div className="text-sm font-bold text-amber-400">+{levelUpModalData.goldEarned} Gold</div>
+                  <div className="text-[8px] text-[#808090]">GOLD COINS</div>
+                  <div className="text-[10px] text-[#FBD000] font-bold">+{levelUpModalData.goldEarned} G</div>
                 </div>
               </div>
             </div>
 
             {levelUpModalData.unlockedAchievements.length > 0 && (
-              <div className="mt-3 p-3 rounded-lg bg-purple-950/40 border border-purple-800/50 text-left">
-                <div className="flex items-center gap-2 text-purple-300 font-semibold text-xs mb-1">
-                  <Trophy className="w-4 h-4 text-purple-400" />
-                  Achievement Unlocked!
+              <div className="p-3 bg-[#281828] border-2 border-black text-left">
+                <div className="text-[9px] text-[#EC4899] font-bold mb-1">
+                  ⭐ STAR MEDAL UNLOCKED!
                 </div>
                 {levelUpModalData.unlockedAchievements.map((ach, idx) => (
-                  <div key={idx} className="flex items-center gap-2 text-sm text-slate-200">
+                  <div key={idx} className="text-[9px] text-white flex items-center gap-2">
                     <span>{ach.icon}</span>
-                    <span className="font-medium">{ach.name}</span>
+                    <span>{ach.name.toUpperCase()}</span>
                   </div>
                 ))}
               </div>
@@ -110,10 +96,10 @@ export function LevelUpModal() {
           </div>
 
           <button
-            onClick={closeLevelUpModal}
-            className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold tracking-wide shadow-lg shadow-amber-500/25 transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-amber-300"
+            onClick={handleClaim}
+            className="pixel-btn pixel-btn-gold w-full text-xs py-3"
           >
-            Claim & Continue Questing
+            ★ CLAIM & CONTINUE ★
           </button>
         </motion.div>
       </div>

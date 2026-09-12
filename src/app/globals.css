@@ -1,112 +1,220 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: #0B0F17;
-    --foreground: #F1F5F9;
-    --card: #111827;
-    --card-foreground: #F1F5F9;
-    --card-muted: #1E293B;
-    --popover: #111827;
-    --popover-foreground: #F1F5F9;
-    --primary: #F59E0B;
-    --primary-foreground: #0B0F17;
-    --secondary: #1E293B;
-    --secondary-foreground: #F1F5F9;
-    --muted: #1E293B;
-    --muted-foreground: #94A3B8;
-    --accent: #38BDF8;
-    --accent-foreground: #0B0F17;
-    --destructive: #EF4444;
-    --destructive-foreground: #F8FAFC;
-    --border: #1E293B;
-    --input: #1E293B;
-    --ring: #F59E0B;
-    --radius: 0.75rem;
+    --background: #181824;
+    --foreground: #F8F8F8;
+    --card: #202030;
+    --card-foreground: #FFFFFF;
+    --border: #000000;
+    --ring: #FBD000;
 
-    /* RPG Attribute Theming */
-    --stat-strength: #EF4444;
-    --stat-intellect: #3B82F6;
-    --stat-discipline: #8B5CF6;
-    --stat-creativity: #EC4899;
-    --stat-vitality: #10B981;
-    --stat-social: #F97316;
+    /* Mario 2D Palette */
+    --mario-red: #E52521;
+    --mario-blue: #5C94FC;
+    --mario-green: #00A800;
+    --mario-yellow: #FBD000;
+    --mario-brick: #B84418;
+    --mario-sky: #6B88FE;
+    --mario-dark: #101018;
   }
 
   .light {
-    --background: #F8FAFC;
-    --foreground: #0F172A;
+    --background: #5C94FC;
+    --foreground: #000000;
     --card: #FFFFFF;
-    --card-foreground: #0F172A;
-    --card-muted: #F1F5F9;
-    --popover: #FFFFFF;
-    --popover-foreground: #0F172A;
-    --primary: #D97706;
-    --primary-foreground: #FFFFFF;
-    --secondary: #E2E8F0;
-    --secondary-foreground: #0F172A;
-    --muted: #F1F5F9;
-    --muted-foreground: #64748B;
-    --accent: #0284C7;
-    --accent-foreground: #FFFFFF;
-    --destructive: #DC2626;
-    --destructive-foreground: #FFFFFF;
-    --border: #E2E8F0;
-    --input: #E2E8F0;
-    --ring: #D97706;
+    --card-foreground: #000000;
+    --border: #000000;
+    --ring: #E52521;
   }
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: 'Silkscreen', 'Press Start 2P', monospace, system-ui, sans-serif;
   min-height: 100vh;
   overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
+  -webkit-font-smoothing: none;
+  image-rendering: pixelated;
 }
 
-/* Custom Scrollbar for RPG feel */
+/* 8-bit Typography */
+.font-pixel {
+  font-family: 'Press Start 2P', monospace, cursive;
+  letter-spacing: -0.5px;
+}
+
+.font-retro {
+  font-family: 'Silkscreen', monospace;
+}
+
+/* Iconic 2D Mario Pixel Border System */
+.pixel-box {
+  position: relative;
+  background-color: #202030;
+  border: 4px solid #000000;
+  box-shadow: inset -4px -4px 0px 0px #101018, inset 4px 4px 0px 0px #383848, 0 6px 0px 0px rgba(0, 0, 0, 0.6);
+}
+
+.pixel-box-mario {
+  position: relative;
+  background-color: #281818;
+  border: 4px solid #000000;
+  box-shadow: inset -4px -4px 0px 0px #180808, inset 4px 4px 0px 0px #E52521, 0 6px 0px 0px #000000;
+}
+
+.pixel-box-green {
+  position: relative;
+  background-color: #102414;
+  border: 4px solid #000000;
+  box-shadow: inset -4px -4px 0px 0px #081408, inset 4px 4px 0px 0px #00A800, 0 6px 0px 0px #000000;
+}
+
+.pixel-box-gold {
+  position: relative;
+  background-color: #282008;
+  border: 4px solid #000000;
+  box-shadow: inset -4px -4px 0px 0px #141004, inset 4px 4px 0px 0px #FBD000, 0 6px 0px 0px #000000;
+}
+
+/* Iconic Question Mark Block [?] */
+.question-block {
+  position: relative;
+  background-color: #F89800;
+  border: 4px solid #000000;
+  box-shadow: inset -4px -4px 0px 0px #884400, inset 4px 4px 0px 0px #FCE000, 0 6px 0px 0px #000000;
+}
+
+/* Chunky 3D Arcade Buttons */
+.pixel-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  border: 3px solid #000000;
+  padding: 10px 16px;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.05s ease, box-shadow 0.05s ease;
+  box-shadow: 0 4px 0px 0px #000000;
+}
+
+.pixel-btn:hover {
+  filter: brightness(1.15);
+}
+
+.pixel-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0px 0px #000000;
+}
+
+.pixel-btn-gold {
+  background-color: #FBD000;
+  color: #000000;
+}
+
+.pixel-btn-green {
+  background-color: #00A800;
+  color: #FFFFFF;
+}
+
+.pixel-btn-red {
+  background-color: #E52521;
+  color: #FFFFFF;
+}
+
+.pixel-btn-blue {
+  background-color: #5C94FC;
+  color: #000000;
+}
+
+.pixel-btn-dark {
+  background-color: #303040;
+  color: #FFFFFF;
+}
+
+/* Stepped Pixel Progress Bar */
+.pixel-bar-container {
+  height: 20px;
+  border: 3px solid #000000;
+  background-color: #101018;
+  padding: 2px;
+  box-shadow: inset 0 2px 0 #000000;
+}
+
+.pixel-bar-fill {
+  height: 100%;
+  background: repeating-linear-gradient(
+    90deg,
+    #5C94FC,
+    #5C94FC 12px,
+    #3060C0 12px,
+    #3060C0 16px
+  );
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.4);
+  transition: width 0.4s steps(10);
+}
+
+.pixel-bar-fill-gold {
+  height: 100%;
+  background: repeating-linear-gradient(
+    90deg,
+    #FBD000,
+    #FBD000 12px,
+    #D09000 12px,
+    #D09000 16px
+  );
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.5);
+  transition: width 0.4s steps(10);
+}
+
+.pixel-bar-fill-green {
+  height: 100%;
+  background: repeating-linear-gradient(
+    90deg,
+    #00E800,
+    #00E800 12px,
+    #00A800 12px,
+    #00A800 16px
+  );
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.5);
+  transition: width 0.4s steps(10);
+}
+
+/* Retro Pixel Coin Spinner */
+@keyframes coin-spin {
+  0%, 100% { transform: scaleX(1); }
+  50% { transform: scaleX(0.2); }
+}
+
+.pixel-coin-spin {
+  display: inline-block;
+  animation: coin-spin 1.2s infinite ease-in-out;
+}
+
+/* Custom Scrollbar for Retro Arcade Feel */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0B0F17;
+  background: #000000;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1E293B;
-  border-radius: 4px;
+  background: #E52521;
+  border: 2px solid #000000;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
-}
-
-/* RPG Component Utility Classes */
-.rpg-border {
-  border: 1px solid var(--border);
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
-}
-
-.rpg-glow-gold {
-  box-shadow: 0 0 20px -3px rgba(245, 158, 11, 0.35);
-}
-
-.rpg-glow-xp {
-  box-shadow: 0 0 20px -3px rgba(56, 189, 248, 0.35);
-}
-
-.rpg-glow-danger {
-  box-shadow: 0 0 20px -3px rgba(239, 68, 68, 0.35);
-}
-
-/* Keyboard Accessible Focus Styles */
-*:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
+  background: #FBD000;
 }

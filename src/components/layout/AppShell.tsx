@@ -42,9 +42,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#0B0F17] text-slate-100 flex flex-col items-center justify-center gap-4">
-        <Loader2 className="w-10 h-10 text-amber-500 animate-spin" />
-        <p className="text-sm font-serif text-slate-400">Loading your realm...</p>
+      <div className="min-h-screen bg-[#0d0d15] text-slate-100 flex flex-col items-center justify-center gap-4">
+        <div className="w-16 h-16 question-block flex items-center justify-center font-pixel text-2xl text-yellow-950 animate-bounce">
+          ?
+        </div>
+        <p className="font-pixel text-xs text-yellow-400 tracking-wider">LOADING WORLD 1-1...</p>
+        <p className="font-retro text-xs text-slate-500">Preparing retro chiptune audio & quest ledger</p>
       </div>
     );
   }

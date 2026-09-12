@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Settings, Volume2, VolumeX, Moon, Sun, Globe, LogOut, Check, Sparkles, User } from "lucide-react";
 import { useGame } from "@/components/providers/GameProvider";
 import { useRouter } from "next/navigation";
+import { soundEngine } from "@/lib/sound";
 
 const TIMEZONES = [
   "UTC",
@@ -25,19 +26,19 @@ export default function SettingsPage() {
   const { profile, soundEnabled, setSoundEnabled, setTheme, refreshGameData, setToast } = useGame();
 
   const [timezone, setTimezone] = useState(profile?.timezone || "UTC");
-  const [displayName, setDisplayName] = useState(profile?.displayName || "");
   const [selectedTheme, setSelectedTheme] = useState(profile?.theme || "dark");
   const [saved, setSaved] = useState(false);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    soundEngine.playCoin();
     setSaved(true);
 
     try {
-      // In production/API update
       setTheme(selectedTheme);
-      setToast({ text: "Settings saved successfully.", type: "success" });
+      setToast({ text: "★ CONFIGURATION SAVED! ★", type: "success" });
     } catch {
+      soundEngine.playPowerDown();
       setToast({ text: "Failed to update settings.", type: "error" });
     } finally {
       setTimeout(() => setSaved(false), 2000);
@@ -45,135 +46,195 @@ export default function SettingsPage() {
   };
 
   const handleLogout = async () => {
+    soundEngine.playPipe();
     await fetch("/api/auth/logout", { method: "POST" });
     router.push("/login");
   };
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-black font-serif text-white tracking-wide flex items-center gap-2.5">
-          <Settings className="w-6 h-6 text-amber-400" />
-          <span>Realm Preferences & Configuration</span>
-        </h1>
-        <p className="text-xs text-slate-400 mt-1">
-          Adjust audio feedback, realm visual themes, and localized streak boundaries.
-        </p>
+      {/* Header Banner */}
+      <div className="pixel-box-mario p-4 md:p-6 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="font-pixel text-[9px] bg-yellow-400 text-slate-950 px-2 py-0.5 border border-black font-bold">
+              PAUSE MENU
+            </span>
+            <span className="font-pixel text-[9px] text-yellow-200">ARCADE CONFIG</span>
+          </div>
+          <h1 className="font-pixel text-base sm:text-xl text-yellow-300 tracking-wider">
+            OPTIONS & SOUND TEST
+          </h1>
+          <p className="font-retro text-xs text-red-100 mt-1">
+            Configure retro 8-bit synthesizer audio, realm graphics, and timezone boundaries.
+          </p>
+        </div>
+
+        <div className="font-pixel text-xs bg-red-950 px-3 py-2 border-2 border-yellow-400 text-yellow-300 w-fit">
+          ⚙️ OPTIONS
+        </div>
       </div>
 
       <form onSubmit={handleSave} className="space-y-6">
-        {/* Audio Card */}
-        <div className="p-6 rounded-2xl bg-[#111827] border border-slate-800 shadow-sm space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-sky-400">
-                {soundEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
-              </div>
-              <div>
-                <h3 className="text-sm font-bold text-white">Retro RPG Audio Feedback</h3>
-                <p className="text-xs text-slate-400">
-                  Synthesizes chimes and victory arpeggios when fulfilling trials or leveling up.
-                </p>
-              </div>
+        {/* Sound Test Card */}
+        <div className="pixel-box p-6 bg-[#181824] border-2 border-slate-700 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h3 className="font-pixel text-xs text-yellow-400 flex items-center gap-2">
+                <span>🔊</span>
+                <span>8-BIT CHIPTUNE AUDIO & SOUND TEST</span>
+              </h3>
+              <p className="font-retro text-xs text-slate-300 mt-1">
+                Procedural Web Audio square wave synthesizer for authentic 1985 arcade tones!
+              </p>
             </div>
 
             <button
               type="button"
-              onClick={() => setSoundEnabled(!soundEnabled)}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                soundEnabled
-                  ? "bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20"
-                  : "bg-slate-800 text-slate-400 hover:text-white"
+              onClick={() => {
+                const next = !soundEnabled;
+                setSoundEnabled(next);
+                if (next) soundEngine.playCoin();
+              }}
+              className={`pixel-btn font-pixel text-[9px] px-3.5 py-2 shrink-0 ${
+                soundEnabled ? "pixel-btn-green text-white" : "pixel-btn-red text-white"
               }`}
             >
-              {soundEnabled ? "Audio Enabled" : "Audio Muted"}
+              {soundEnabled ? "AUDIO: ENABLED" : "AUDIO: MUTED"}
             </button>
+          </div>
+
+          {/* Sound Test Board */}
+          <div className="p-4 bg-slate-900 border-2 border-slate-800 space-y-2">
+            <div className="font-pixel text-[9px] text-yellow-500 uppercase">SOUND TEST PREVIEW:</div>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => soundEngine.playCoin()}
+                className="font-pixel text-[8px] px-2.5 py-1.5 bg-yellow-400 text-slate-950 border border-black hover:bg-yellow-300 active:translate-y-0.5"
+              >
+                🪙 COIN
+              </button>
+              <button
+                type="button"
+                onClick={() => soundEngine.playJump()}
+                className="font-pixel text-[8px] px-2.5 py-1.5 bg-sky-500 text-white border border-black hover:bg-sky-400 active:translate-y-0.5"
+              >
+                ⬆️ JUMP
+              </button>
+              <button
+                type="button"
+                onClick={() => soundEngine.playPowerUp()}
+                className="font-pixel text-[8px] px-2.5 py-1.5 bg-purple-500 text-white border border-black hover:bg-purple-400 active:translate-y-0.5"
+              >
+                ⭐ POWER-UP
+              </button>
+              <button
+                type="button"
+                onClick={() => soundEngine.playLevelUp()}
+                className="font-pixel text-[8px] px-2.5 py-1.5 bg-red-500 text-white border border-black hover:bg-red-400 active:translate-y-0.5"
+              >
+                🍄 1-UP JINGLE
+              </button>
+              <button
+                type="button"
+                onClick={() => soundEngine.playQuestComplete()}
+                className="font-pixel text-[8px] px-2.5 py-1.5 bg-emerald-500 text-white border border-black hover:bg-emerald-400 active:translate-y-0.5"
+              >
+                🚩 STAGE CLEAR
+              </button>
+              <button
+                type="button"
+                onClick={() => soundEngine.playPipe()}
+                className="font-pixel text-[8px] px-2.5 py-1.5 bg-emerald-700 text-white border border-black hover:bg-emerald-600 active:translate-y-0.5"
+              >
+                🕳️ WARP PIPE
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Theme Card */}
-        <div className="p-6 rounded-2xl bg-[#111827] border border-slate-800 shadow-sm space-y-4">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-amber-400">
-              <Sparkles className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-white">Visual Palette</h3>
-              <p className="text-xs text-slate-400">Choose your interface atmosphere.</p>
-            </div>
+        {/* Visual Theme Card */}
+        <div className="pixel-box p-6 bg-[#181824] border-2 border-slate-700 space-y-4">
+          <div>
+            <h3 className="font-pixel text-xs text-yellow-400 flex items-center gap-2">
+              <span>🎨</span>
+              <span>REALM PALETTE</span>
+            </h3>
+            <p className="font-retro text-xs text-slate-300 mt-1">Choose your game screen backdrop.</p>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             {[
-              { id: "dark", label: "Arcane Obsidian", desc: "Dark fantasy canvas with glowing accents" },
-              { id: "light", label: "Solar Parchment", desc: "Clean bright parchment for daylight focus" },
+              { id: "dark", label: "ARCANE OBSIDIAN", desc: "Dark fantasy canvas with retro neon pixel accents" },
+              { id: "light", label: "SOLAR PARCHMENT", desc: "Daylight overworld palette with amber accents" },
             ].map((t) => {
               const isSelected = selectedTheme === t.id;
               return (
                 <div
                   key={t.id}
-                  onClick={() => setSelectedTheme(t.id)}
-                  className={`p-3.5 rounded-xl border cursor-pointer select-none transition-all ${
+                  onClick={() => {
+                    soundEngine.playPause();
+                    setSelectedTheme(t.id);
+                  }}
+                  className={`p-3.5 border-2 cursor-pointer select-none transition-all ${
                     isSelected
-                      ? "bg-amber-500/10 border-amber-500 shadow-sm"
-                      : "bg-slate-900 border-slate-800 hover:border-slate-700"
+                      ? "bg-slate-900 border-yellow-400 shadow-[3px_3px_0px_#eab308]"
+                      : "bg-slate-950 border-slate-700 hover:border-slate-500"
                   }`}
                 >
-                  <div className={`text-sm font-bold ${isSelected ? "text-amber-400" : "text-slate-200"}`}>
+                  <div className={`font-pixel text-[10px] ${isSelected ? "text-yellow-400" : "text-slate-300"}`}>
                     {t.label}
                   </div>
-                  <p className="text-xs text-slate-400 mt-0.5">{t.desc}</p>
+                  <p className="font-retro text-xs text-slate-400 mt-1">{t.desc}</p>
                 </div>
               );
             })}
           </div>
         </div>
 
-        {/* Timezone & Identity */}
-        <div className="p-6 rounded-2xl bg-[#111827] border border-slate-800 shadow-sm space-y-4">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-emerald-400">
-              <Globe className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-white">Daily Streak Timezone</h3>
-              <p className="text-xs text-slate-400">
-                Determines calendar day boundaries for streak incrementation and daily challenges.
-              </p>
-            </div>
+        {/* Timezone & Streak Boundaries */}
+        <div className="pixel-box p-6 bg-[#181824] border-2 border-slate-700 space-y-4">
+          <div>
+            <h3 className="font-pixel text-xs text-yellow-400 flex items-center gap-2">
+              <span>🌍</span>
+              <span>DAILY STREAK TIMEZONE</span>
+            </h3>
+            <p className="font-retro text-xs text-slate-300 mt-1">
+              Determines calendar midnight for daily challenge resets and streak continuity.
+            </p>
           </div>
 
-          <div>
-            <select
-              value={timezone}
-              onChange={(e) => setTimezone(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-100 text-xs focus:border-amber-500 outline-none"
-            >
-              {TIMEZONES.map((tz) => (
-                <option key={tz} value={tz}>
-                  {tz}
-                </option>
-              ))}
-            </select>
-          </div>
+          <select
+            value={timezone}
+            onChange={(e) => setTimezone(e.target.value)}
+            className="w-full px-3.5 py-2.5 bg-slate-900 border-2 border-slate-700 text-yellow-300 font-pixel text-xs focus:border-yellow-400 outline-none"
+          >
+            {TIMEZONES.map((tz) => (
+              <option key={tz} value={tz}>
+                {tz}
+              </option>
+            ))}
+          </select>
         </div>
 
-        <div className="flex items-center justify-between pt-2">
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
           <button
             type="button"
             onClick={handleLogout}
-            className="px-4 py-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 font-semibold text-xs flex items-center gap-2 transition-colors"
+            className="pixel-btn pixel-btn-red font-pixel text-[9px] px-4 py-3 text-white flex items-center gap-2 w-full sm:w-auto justify-center"
           >
             <LogOut className="w-4 h-4" />
-            <span>Abandon Session (Log Out)</span>
+            <span>ABANDON SESSION (LOG OUT)</span>
           </button>
 
           <button
             type="submit"
-            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 text-slate-950 font-bold text-xs shadow-md shadow-amber-500/20 active:scale-95 transition-all flex items-center gap-1.5"
+            className="pixel-btn pixel-btn-yellow font-pixel text-[10px] px-6 py-3 text-slate-950 flex items-center gap-2 w-full sm:w-auto justify-center"
           >
-            {saved ? <Check className="w-4 h-4" /> : null}
-            <span>{saved ? "Preferences Saved" : "Save Preferences"}</span>
+            {saved ? <Check className="w-4 h-4" /> : <span>💾</span>}
+            <span>{saved ? "CONFIG SAVED!" : "SAVE CONFIGURATION"}</span>
           </button>
         </div>
       </form>

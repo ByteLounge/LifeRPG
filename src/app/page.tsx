@@ -2,191 +2,153 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import {
-  Sparkles,
-  Shield,
-  Flame,
-  Award,
-  ArrowRight,
-  CheckCircle2,
-  Zap,
-  Sword,
-  Scroll,
-} from "lucide-react";
 import { soundEngine } from "@/lib/sound";
 
 export default function LandingPage() {
-  const [demoCompleted, setDemoCompleted] = useState(false);
+  const [demoHit, setDemoHit] = useState(false);
+  const [demoCoins, setDemoCoins] = useState(35);
   const [demoXp, setDemoXp] = useState(50);
-  const [demoGold, setDemoGold] = useState(35);
 
-  const handleDemoComplete = () => {
-    if (demoCompleted) return;
-    setDemoCompleted(true);
-    setDemoXp((prev) => prev + 50);
-    setDemoGold((prev) => prev + 35);
-    soundEngine.playQuestComplete();
+  const handleHitBlock = () => {
+    soundEngine.playCoin();
+    setDemoCoins((prev) => prev + 1);
+    setDemoXp((prev) => prev + 25);
+    setDemoHit(true);
+    setTimeout(() => setDemoHit(false), 200);
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Navigation Header */}
-      <header className="px-6 py-5 flex items-center justify-between border-b border-slate-800/80 max-w-7xl mx-auto w-full">
+    <div className="flex flex-col min-h-screen bg-[#181824] text-white select-none">
+      {/* 2D Mario Arcade Header */}
+      <header className="px-4 md:px-8 py-4 bg-[#000000] border-b-4 border-black flex items-center justify-between shadow-[0_4px_0_0_#202030] font-pixel">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-slate-950 font-black shadow-rpg-gold">
-            <Sparkles className="w-5 h-5 text-slate-950" />
+          <div className="w-8 h-8 bg-[#E52521] border-2 border-white flex items-center justify-center text-sm">
+            🍄
           </div>
-          <span className="font-serif font-black tracking-wider text-lg text-white">LIFE RPG</span>
+          <div>
+            <span className="text-[#FBD000] text-sm md:text-base font-black tracking-wider">SUPER LIFE RPG</span>
+            <div className="text-[8px] text-[#A0A0B0]">WORLD 1-1 PRODUCTIVITY</div>
+          </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <Link
             href="/login"
-            className="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white transition-colors"
+            className="pixel-btn pixel-btn-dark text-[9px] md:text-[10px] py-2 px-3"
           >
-            Sign In
+            CONTINUE
           </Link>
           <Link
             href="/signup"
-            className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm tracking-wide shadow-md shadow-amber-500/20 transition-all active:scale-95"
+            className="pixel-btn pixel-btn-gold text-[9px] md:text-[10px] py-2 px-3"
           >
-            Begin Journey
+            START 1P
           </Link>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="flex-1 flex flex-col items-center justify-center px-4 py-16 text-center max-w-4xl mx-auto">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold uppercase tracking-wider mb-6">
-          <Zap className="w-4 h-4 text-amber-400" />
-          Server-Authoritative Real Life RPG
+      <section className="flex-1 flex flex-col items-center justify-center px-4 py-12 md:py-16 text-center max-w-4xl mx-auto space-y-8">
+        <div className="inline-block bg-[#E52521] border-4 border-black px-4 py-1.5 font-pixel text-[10px] md:text-xs text-white shadow-[4px_4px_0_#000]">
+          ★ 8-BIT GAMIFIED PRODUCTIVITY ★
         </div>
 
-        <h1 className="text-4xl md:text-6xl font-black font-serif tracking-tight text-white mb-6 leading-tight">
-          Turn Everyday Tasks Into An <br />
-          <span className="bg-gradient-to-r from-amber-400 via-amber-200 to-amber-500 bg-clip-text text-transparent">
-            Epic RPG Adventure
-          </span>
+        <h1 className="font-pixel text-2xl md:text-4xl lg:text-5xl leading-tight text-[#FBD000] drop-shadow-[4px_4px_0_#000]">
+          TRANSFORM HABITS <br />
+          <span className="text-[#5C94FC]">INTO AN 8-BIT RPG!</span>
         </h1>
 
-        <p className="text-lg md:text-xl text-slate-300 max-w-2xl mb-10 leading-relaxed">
-          Stop struggling with generic to-do lists. Complete real-world study, workouts, and work
-          goals to gain XP, unlock heroic gear, level up your stats, and build unbroken streaks.
+        <p className="font-retro text-sm md:text-base text-slate-300 max-w-xl mx-auto leading-relaxed">
+          Clear real-world study routines, physical conditioning, and tasks to collect Gold Coins, level up your hero, and unlock legendary retro cosmetics!
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto mb-16">
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full pt-2">
           <Link
             href="/signup"
-            className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-base shadow-xl shadow-amber-500/25 flex items-center justify-center gap-2 transition-all active:scale-95"
+            onClick={() => soundEngine.playJump()}
+            className="pixel-btn pixel-btn-green w-full sm:w-auto text-xs md:text-sm py-3 px-6"
           >
-            <span>Create Your Character</span>
-            <ArrowRight className="w-5 h-5" />
+            🎮 PRESS START (SIGN UP)
           </Link>
           <Link
             href="/login"
-            className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 font-semibold text-base transition-colors"
+            onClick={() => soundEngine.playJump()}
+            className="pixel-btn pixel-btn-blue w-full sm:w-auto text-xs md:text-sm py-3 px-6"
           >
-            Enter Realm Demo
+            ⚡ INSTANT DEMO RUN
           </Link>
         </div>
 
-        {/* Live Interactive Quest Preview Card */}
-        <div className="w-full max-w-lg p-6 rounded-2xl bg-[#111827] border border-slate-800 shadow-2xl text-left">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-semibold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-              <Sword className="w-4 h-4" />
-              Interactive Quest Preview
-            </span>
-            <div className="flex items-center gap-3 text-xs font-mono">
-              <span className="text-sky-400 font-bold">{demoXp} XP</span>
-              <span className="text-amber-400 font-bold">🪙 {demoGold} Gold</span>
+        {/* Interactive Mario Question Block Card */}
+        <div className="w-full max-w-md p-6 pixel-box text-left mt-8 font-pixel">
+          <div className="flex items-center justify-between text-[10px] mb-4 pb-2 border-b-2 border-black">
+            <span className="text-[#FBD000]">HIT THE [?] BLOCK:</span>
+            <div className="flex items-center gap-3">
+              <span className="text-[#5C94FC]">{demoXp} XP</span>
+              <span className="text-[#FBD000]">🪙 x{demoCoins}</span>
             </div>
           </div>
 
           <div
-            onClick={handleDemoComplete}
-            className={`p-4 rounded-xl border transition-all cursor-pointer select-none flex items-center justify-between ${
-              demoCompleted
-                ? "bg-emerald-950/20 border-emerald-500/50"
-                : "bg-slate-900 hover:bg-slate-850 border-slate-800 hover:border-amber-500/50 shadow-md"
+            onClick={handleHitBlock}
+            className={`p-4 question-block cursor-pointer transition-transform ${
+              demoHit ? "-translate-y-2 brightness-125" : "hover:-translate-y-0.5"
             }`}
           >
-            <div className="flex items-start gap-3">
-              <div
-                className={`w-6 h-6 rounded-md border flex items-center justify-center mt-0.5 transition-colors ${
-                  demoCompleted
-                    ? "bg-emerald-500 border-emerald-400 text-slate-950"
-                    : "border-slate-600 bg-slate-800 text-transparent"
-                }`}
-              >
-                <CheckCircle2 className="w-4 h-4" />
+            <div className="flex items-center gap-3 text-black">
+              <div className="w-10 h-10 bg-black text-[#FBD000] border-2 border-white flex items-center justify-center text-lg font-black shrink-0">
+                ?
               </div>
               <div>
-                <h4
-                  className={`text-sm font-bold ${
-                    demoCompleted ? "line-through text-slate-500" : "text-slate-100"
-                  }`}
-                >
-                  Deep Focus: Complete 45 Minutes of Study / Coding
-                </h4>
-                <p className="text-xs text-slate-400 mt-1">
-                  Rewards: +50 XP • +35 Gold • +30 Intellect XP
-                </p>
+                <div className="text-[10px] font-black">
+                  STUDY FOR 45 MINUTES
+                </div>
+                <div className="text-[8px] text-[#502000] font-bold mt-1">
+                  REWARDS: +25 EXP • +1 COIN • +15 INTELLECT
+                </div>
               </div>
             </div>
-
-            <span
-              className={`text-xs font-bold px-2 py-1 rounded ${
-                demoCompleted ? "bg-emerald-500/20 text-emerald-400" : "bg-amber-500/20 text-amber-400"
-              }`}
-            >
-              {demoCompleted ? "COMPLETED" : "CLICK TO COMPLETE"}
-            </span>
           </div>
-          <p className="text-[11px] text-slate-500 text-center mt-3">
-            Try clicking the quest card above to test the tactile feedback!
+
+          <p className="text-[8px] text-center text-[#A0A0B0] mt-3">
+            ▲ TAP THE BLOCK ABOVE TO TEST RETRO COIN SFX ▲
           </p>
         </div>
       </section>
 
-      {/* Feature Pillar Grid */}
-      <section className="border-t border-slate-800/80 py-16 px-4 bg-[#090D15]">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800">
-            <div className="w-12 h-12 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 mb-4">
-              <Shield className="w-6 h-6" />
-            </div>
-            <h3 className="text-lg font-bold text-white font-serif mb-2">Server-Authoritative Progression</h3>
-            <p className="text-sm text-slate-400">
-              No fake client stats or easily tampered localStorage. All XP gains, non-linear level curves, and reward calculations are locked down server-side.
+      {/* Feature Blocks (Styled like Brick / Pipe / Star Blocks) */}
+      <section className="py-12 px-4 bg-[#101018] border-t-4 border-black font-pixel">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="p-5 pixel-box-mario">
+            <div className="text-2xl mb-3">🍄</div>
+            <h3 className="text-xs font-bold text-[#E52521] mb-2">SERVER-AUTHORITATIVE</h3>
+            <p className="font-retro text-xs text-slate-300 leading-relaxed">
+              No client cheating! All EXP curves, levels, and coin transactions are verified on the backend.
             </p>
           </div>
 
-          <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800">
-            <div className="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center text-orange-400 mb-4">
-              <Flame className="w-6 h-6" />
-            </div>
-            <h3 className="text-lg font-bold text-white font-serif mb-2">Timezone-Aware Streaks</h3>
-            <p className="text-sm text-slate-400">
-              Never lose your streak unfairly across timezones. The streak engine accurately calculates calendar boundaries to fuel continuous momentum.
+          <div className="p-5 pixel-box-green">
+            <div className="text-2xl mb-3">🔥</div>
+            <h3 className="text-xs font-bold text-[#00E800] mb-2">FIREBALL STREAKS</h3>
+            <p className="font-retro text-xs text-slate-300 leading-relaxed">
+              Timezone-aware daily streak engine keeps your momentum burning every day.
             </p>
           </div>
 
-          <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800">
-            <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 mb-4">
-              <Award className="w-6 h-6" />
-            </div>
-            <h3 className="text-lg font-bold text-white font-serif mb-2">Bazaar, Cosmetics & Titles</h3>
-            <p className="text-sm text-slate-400">
-              Spend earned gold in the virtual shop to customize your hero with rare avatar frames, prestiged titles, and unlockable themes.
+          <div className="p-5 pixel-box-gold">
+            <div className="text-2xl mb-3">⭐</div>
+            <h3 className="text-xs font-bold text-[#FBD000] mb-2">TOAD&apos;S BAZAAR</h3>
+            <p className="font-retro text-xs text-slate-300 leading-relaxed">
+              Spend your earned gold coins on rare avatar frames, titles, and custom realm themes.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-6 px-4 border-t border-slate-800/80 text-center text-xs text-slate-500">
-        © 2026 Life RPG. Built for high-performance productivity and heroic discipline.
+      {/* Retro Arcade Footer */}
+      <footer className="py-4 px-4 bg-black border-t-4 border-black text-center font-pixel text-[8px] text-[#808090]">
+        © 2026 SUPER LIFE RPG • 2D RETRO PRODUCTIVITY SYSTEM
       </footer>
     </div>
   );

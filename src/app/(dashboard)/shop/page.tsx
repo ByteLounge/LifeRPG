@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { Store, Coins, Check, AlertCircle, Sparkles, Loader2 } from "lucide-react";
 import { useGame } from "@/components/providers/GameProvider";
 import { formatNumber } from "@/lib/utils";
+import { soundEngine } from "@/lib/sound";
 
 interface ShopItemCatalog {
   id: string;
@@ -49,8 +49,9 @@ export default function ShopPage() {
     if (item.isOwned) return;
 
     if ((character?.gold || 0) < item.price) {
+      soundEngine.playJump();
       setToast({
-        text: `Insufficient gold! You need ${item.price} Gold, but currently possess ${character?.gold || 0} Gold.`,
+        text: `NEED MORE COINS! PRICE: ${item.price} G, YOU HAVE: ${character?.gold || 0} G`,
         type: "error",
       });
       return;
@@ -67,16 +68,17 @@ export default function ShopPage() {
 
       const json = await res.json();
       if (!res.ok || !json.success) {
-        setToast({ text: json.error?.message || "Purchase failed.", type: "error" });
+        setToast({ text: json.error?.message || "PURCHASE FAILED.", type: "error" });
         return;
       }
 
+      soundEngine.playCoin();
       spendGoldOptimistic(item.price);
-      setToast({ text: `Successfully acquired ${item.name}! Added to your inventory.`, type: "success" });
+      setToast({ text: `ACQUIRED ${item.name}! STORED IN BAG.`, type: "success" });
       await fetchCatalog();
       await refreshGameData();
     } catch {
-      setToast({ text: "Network error during transaction.", type: "error" });
+      setToast({ text: "WARP ERROR DURING PURCHASE.", type: "error" });
     } finally {
       setPurchasingId(null);
     }
@@ -88,22 +90,27 @@ export default function ShopPage() {
   });
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      {/* Header & Treasury Status */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-black font-serif text-white tracking-wide flex items-center gap-2.5">
-            <Store className="w-6 h-6 text-amber-400" />
-            <span>Merchant&apos;s Bazaar</span>
+    <div className="max-w-6xl mx-auto space-y-6 select-none font-pixel">
+      {/* Toad's Shop Header Banner */}
+      <div className="p-6 bg-[#E52521] border-4 border-black text-white shadow-[0_6px_0_#000] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <div className="text-[9px] text-[#FBD000] font-bold">★ TOAD&apos;S ITEM SHOP ★</div>
+          <h1 className="text-lg md:text-2xl font-black drop-shadow-[2px_2px_0_#000]">
+            POWER-UP BAZAAR
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
-            Exchange your earned quest spoils for cosmetic crests, titles, and themes.
+          <p className="font-retro text-xs text-white/90">
+            Trade your hard-earned gold coins for cosmetic frames and prestige titles!
           </p>
         </div>
 
-        <div className="px-4 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 font-bold text-sm flex items-center gap-2 shadow-sm w-fit">
-          <Coins className="w-5 h-5 text-amber-400" />
-          <span>Available: {formatNumber(character?.gold || 0)} Gold</span>
+        <div className="p-3 bg-black border-2 border-white shadow-[2px_2px_0_#000] flex items-center gap-2 self-start sm:self-auto">
+          <span className="text-xl pixel-coin-spin">🪙</span>
+          <div>
+            <div className="text-[8px] text-[#A0A0B0]">COIN PURSE</div>
+            <div className="text-sm font-bold text-[#FBD000]">
+              {formatNumber(character?.gold || 0)} G
+            </div>
+          </div>
         </div>
       </div>
 
@@ -112,22 +119,23 @@ export default function ShopPage() {
         {["ALL", "AVATAR_FRAME", "TITLE", "THEME", "BADGE"].map((type) => (
           <button
             key={type}
-            onClick={() => setFilterType(type)}
-            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors ${
-              filterType === type
-                ? "bg-amber-500 text-slate-950 shadow-sm"
-                : "bg-slate-900 border border-slate-800 text-slate-400 hover:text-white"
-            }`}
+            onClick={() => {
+              soundEngine.playJump();
+              setFilterType(type);
+            }}
+            className={`pixel-btn ${
+              filterType === type ? "pixel-btn-gold" : "pixel-btn-dark"
+            } text-[8px] py-2 px-3`}
           >
             {type === "ALL"
-              ? "All Goods"
+              ? "ALL ITEMS"
               : type === "AVATAR_FRAME"
-              ? "Avatar Frames"
+              ? "FRAMES"
               : type === "TITLE"
-              ? "Honorary Titles"
+              ? "TITLES"
               : type === "THEME"
-              ? "Themes"
-              : "Badges"}
+              ? "THEMES"
+              : "BADGES"}
           </button>
         ))}
       </div>
@@ -135,8 +143,8 @@ export default function ShopPage() {
       {/* Catalog Grid */}
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="h-48 rounded-2xl bg-slate-900/60 animate-pulse border border-slate-800" />
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-44 bg-[#202030] border-4 border-black animate-pulse" />
           ))}
         </div>
       ) : (
@@ -148,65 +156,54 @@ export default function ShopPage() {
             return (
               <div
                 key={item.id}
-                className={`p-5 rounded-2xl border transition-all flex flex-col justify-between gap-4 ${
+                className={`p-5 border-4 border-black transition-all flex flex-col justify-between gap-3 ${
                   item.isOwned
-                    ? "bg-slate-900/40 border-slate-800/80 opacity-80"
-                    : "bg-[#111827] hover:bg-[#131d2e] border-slate-800 hover:border-amber-500/40 shadow-sm"
+                    ? "bg-[#141420] opacity-70"
+                    : "bg-[#202030] hover:bg-[#282838] shadow-[0_5px_0_#000]"
                 }`}
               >
                 <div>
-                  <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center justify-between mb-2">
                     <span className="text-3xl">{item.icon}</span>
                     <span
-                      className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${
+                      className={`text-[7px] font-bold px-1.5 py-0.5 border border-black ${
                         item.rarity === "COMMON"
-                          ? "bg-slate-800 text-slate-400"
+                          ? "bg-slate-700 text-white"
                           : item.rarity === "RARE"
-                          ? "bg-blue-500/15 text-blue-400"
+                          ? "bg-[#5C94FC] text-black"
                           : item.rarity === "EPIC"
-                          ? "bg-purple-500/15 text-purple-400"
-                          : "bg-amber-500/15 text-amber-400"
+                          ? "bg-[#EC4899] text-white"
+                          : "bg-[#FBD000] text-black"
                       }`}
                     >
                       {item.rarity}
                     </span>
                   </div>
 
-                  <h3 className="text-base font-bold text-white mb-1">{item.name}</h3>
-                  <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">
+                  <h3 className="text-xs font-bold text-white mb-1">{item.name.toUpperCase()}</h3>
+                  <p className="font-retro text-xs text-slate-300 leading-relaxed line-clamp-2">
                     {item.description}
                   </p>
                 </div>
 
-                <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 font-mono text-sm font-bold text-amber-400">
-                    <Coins className="w-4 h-4" />
+                <div className="pt-2 border-t-2 border-black flex items-center justify-between text-[9px]">
+                  <div className="text-[#FBD000] font-bold flex items-center gap-1">
+                    <span className="pixel-coin-spin">🪙</span>
                     <span>{item.price} G</span>
                   </div>
 
                   <button
                     onClick={() => handlePurchase(item)}
                     disabled={item.isOwned || !canAfford || isPurchasing}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
+                    className={`pixel-btn ${
                       item.isOwned
-                        ? "bg-emerald-950/40 text-emerald-400 border border-emerald-800/40 cursor-default"
+                        ? "pixel-btn-dark opacity-60 cursor-default"
                         : canAfford
-                        ? "bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 text-slate-950 shadow-md shadow-amber-500/20 active:scale-95"
-                        : "bg-slate-800 text-slate-500 cursor-not-allowed"
-                    }`}
+                        ? "pixel-btn-gold"
+                        : "pixel-btn-dark opacity-50 cursor-not-allowed"
+                    } text-[8px] py-1.5 px-2.5`}
                   >
-                    {isPurchasing ? (
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    ) : item.isOwned ? (
-                      <>
-                        <Check className="w-3.5 h-3.5" />
-                        <span>Owned</span>
-                      </>
-                    ) : canAfford ? (
-                      <span>Acquire</span>
-                    ) : (
-                      <span>Need Gold</span>
-                    )}
+                    {isPurchasing ? "..." : item.isOwned ? "✓ OWNED" : canAfford ? "★ BUY" : "NEED G"}
                   </button>
                 </div>
               </div>

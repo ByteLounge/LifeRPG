@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { X, Sparkles, Loader2, Shield, Calendar, Clock, BookOpen, Dumbbell, Flame, Palette, Heart, Users } from "lucide-react";
 import { QuestDifficulty, AttributeType } from "@/lib/game-engine/progression";
+import { soundEngine } from "@/lib/sound";
 
 interface CreateQuestModalProps {
   isOpen: boolean;
@@ -10,20 +10,20 @@ interface CreateQuestModalProps {
   onQuestCreated: () => void;
 }
 
-const ATTRIBUTES: Array<{ id: AttributeType; label: string; icon: typeof BookOpen }> = [
-  { id: "DISCIPLINE", label: "Discipline", icon: Flame },
-  { id: "INTELLECT", label: "Intellect", icon: BookOpen },
-  { id: "STRENGTH", label: "Strength", icon: Dumbbell },
-  { id: "CREATIVITY", label: "Creativity", icon: Palette },
-  { id: "VITALITY", label: "Vitality", icon: Heart },
-  { id: "SOCIAL", label: "Social", icon: Users },
+const ATTRIBUTES: Array<{ id: AttributeType; label: string; icon: string }> = [
+  { id: "DISCIPLINE", label: "DISCIPLINE", icon: "🔥" },
+  { id: "INTELLECT", label: "INTELLECT", icon: "📜" },
+  { id: "STRENGTH", label: "STRENGTH", icon: "💪" },
+  { id: "CREATIVITY", label: "CREATIVITY", icon: "🎨" },
+  { id: "VITALITY", label: "VITALITY", icon: "🍄" },
+  { id: "SOCIAL", label: "SOCIAL", icon: "🤝" },
 ];
 
-const DIFFICULTIES: Array<{ id: QuestDifficulty; label: string; xp: number; gold: number; color: string }> = [
-  { id: "EASY", label: "Easy", xp: 25, gold: 15, color: "text-emerald-400 border-emerald-500/40 bg-emerald-500/10" },
-  { id: "MEDIUM", label: "Medium", xp: 50, gold: 35, color: "text-blue-400 border-blue-500/40 bg-blue-500/10" },
-  { id: "HARD", label: "Hard", xp: 100, gold: 80, color: "text-amber-400 border-amber-500/40 bg-amber-500/10" },
-  { id: "EPIC", label: "Epic", xp: 250, gold: 200, color: "text-purple-400 border-purple-500/40 bg-purple-500/10" },
+const DIFFICULTIES: Array<{ id: QuestDifficulty; label: string; xp: number; gold: number; colorClass: string }> = [
+  { id: "EASY", label: "EASY", xp: 25, gold: 15, colorClass: "pixel-btn-green" },
+  { id: "MEDIUM", label: "MEDIUM", xp: 50, gold: 35, colorClass: "pixel-btn-blue" },
+  { id: "HARD", label: "HARD", xp: 100, gold: 80, colorClass: "pixel-btn-gold" },
+  { id: "EPIC", label: "EPIC", xp: 250, gold: 200, colorClass: "pixel-btn-red" },
 ];
 
 export function CreateQuestModal({ isOpen, onClose, onQuestCreated }: CreateQuestModalProps) {
@@ -42,7 +42,7 @@ export function CreateQuestModal({ isOpen, onClose, onQuestCreated }: CreateQues
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) {
-      setError("Quest title is required.");
+      setError("Trial title cannot be blank!");
       return;
     }
 
@@ -66,16 +66,17 @@ export function CreateQuestModal({ isOpen, onClose, onQuestCreated }: CreateQues
 
       const json = await res.json();
       if (!res.ok || !json.success) {
-        setError(json.error?.message || "Failed to scribe quest.");
+        setError(json.error?.message || "Failed to scribe trial.");
         return;
       }
 
+      soundEngine.playCoin();
       setTitle("");
       setDescription("");
       onQuestCreated();
       onClose();
     } catch {
-      setError("Network error while scribing quest.");
+      setError("Network warp error!");
     } finally {
       setLoading(false);
     }
@@ -83,147 +84,131 @@ export function CreateQuestModal({ isOpen, onClose, onQuestCreated }: CreateQues
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-xs font-pixel select-none"
       role="dialog"
       aria-modal="true"
-      aria-labelledby="modal-title"
     >
-      <div className="relative w-full max-w-lg p-6 rounded-2xl bg-[#111827] border border-slate-800 shadow-2xl text-slate-100 max-h-[90vh] overflow-y-auto">
+      <div className="relative w-full max-w-lg p-6 bg-[#202030] border-4 border-black shadow-[inset_-4px_-4px_0_#101018,inset_4px_4px_0_#383848,0_10px_0_#000] text-white max-h-[90vh] overflow-y-auto">
         {/* Close Button */}
         <button
-          onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors focus-visible:ring-2 focus-visible:ring-amber-400"
-          aria-label="Close dialog"
+          onClick={() => {
+            soundEngine.playJump();
+            onClose();
+          }}
+          className="absolute top-4 right-4 pixel-btn pixel-btn-red text-[10px] py-1 px-2"
         >
-          <X className="w-5 h-5" />
+          ✕
         </button>
 
-        <div className="flex items-center gap-2 text-amber-400 font-semibold text-xs uppercase tracking-wider mb-1">
-          <Sparkles className="w-4 h-4" />
-          Quest Registry
+        <div className="text-[9px] text-[#FBD000] uppercase mb-1">
+          ★ QUEST REGISTRY ★
         </div>
-        <h3 id="modal-title" className="text-xl font-bold font-serif text-white mb-4">
-          Scribe New Quest
+        <h3 className="text-sm md:text-base font-black text-white mb-4">
+          SCRIBE NEW TRIAL
         </h3>
 
         {error && (
-          <div className="mb-4 p-3 rounded-lg bg-rose-950/40 border border-rose-800 text-rose-300 text-xs">
-            {error}
+          <div className="mb-4 p-2.5 bg-[#E52521] border-2 border-black text-white text-[9px]">
+            ⚠ {error.toUpperCase()}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 text-[10px]">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-              Quest Title *
-            </label>
+            <label className="block text-[#A0A0B0] mb-1.5">TRIAL TITLE *</label>
             <input
               type="text"
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. Read 20 pages of Systems Design"
+              placeholder="e.g. Read 20 pages"
               maxLength={120}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-100 placeholder-slate-600 text-sm focus:border-amber-500 outline-none"
+              className="w-full px-3 py-2.5 bg-[#101018] border-2 border-black text-white placeholder-slate-600 font-pixel text-[10px] outline-none focus:border-[#FBD000]"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-              Description (Optional)
-            </label>
+            <label className="block text-[#A0A0B0] mb-1.5">NOTES (OPTIONAL)</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Add details, links, or specific acceptance criteria..."
+              placeholder="Acceptance criteria or details..."
               rows={2}
               maxLength={500}
-              className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-100 placeholder-slate-600 text-sm focus:border-amber-500 outline-none resize-none"
+              className="w-full px-3 py-2 bg-[#101018] border-2 border-black text-white placeholder-slate-600 font-retro text-xs outline-none focus:border-[#FBD000] resize-none"
             />
           </div>
 
           {/* Difficulty Selection */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-              Challenge Difficulty & Server Rewards
-            </label>
+            <label className="block text-[#A0A0B0] mb-1.5">DIFFICULTY & PRIZE</label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {DIFFICULTIES.map((d) => (
                 <button
                   type="button"
                   key={d.id}
-                  onClick={() => setDifficulty(d.id)}
-                  className={`p-2.5 rounded-xl border text-center transition-all ${
-                    difficulty === d.id
-                      ? `${d.color} ring-1 ring-amber-400 font-bold shadow-sm`
-                      : "bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700"
-                  }`}
+                  onClick={() => {
+                    soundEngine.playJump();
+                    setDifficulty(d.id);
+                  }}
+                  className={`pixel-btn ${
+                    difficulty === d.id ? d.colorClass : "pixel-btn-dark opacity-60"
+                  } text-[8px] py-2 px-1 flex flex-col items-center justify-center`}
                 >
-                  <div className="text-xs font-bold">{d.label}</div>
-                  <div className="text-[10px] text-slate-400 mt-0.5 font-mono">
-                    +{d.xp} XP • +{d.gold} G
-                  </div>
+                  <span className="font-bold">{d.label}</span>
+                  <span className="text-[7px] mt-0.5">+{d.xp}XP / +{d.gold}G</span>
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Attribute Target */}
+          {/* Governing Attribute */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-              Governing Attribute
-            </label>
-            <div className="grid grid-cols-3 gap-2">
-              {ATTRIBUTES.map((attr) => {
-                const Icon = attr.icon;
-                const isSelected = attributeType === attr.id;
-                return (
-                  <button
-                    type="button"
-                    key={attr.id}
-                    onClick={() => setAttributeType(attr.id)}
-                    className={`flex items-center gap-2 p-2 rounded-xl border text-xs font-semibold transition-all ${
-                      isSelected
-                        ? "bg-amber-500/15 border-amber-500 text-amber-300"
-                        : "bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700"
-                    }`}
-                  >
-                    <Icon className="w-3.5 h-3.5 shrink-0" />
-                    <span className="truncate">{attr.label}</span>
-                  </button>
-                );
-              })}
+            <label className="block text-[#A0A0B0] mb-1.5">GOVERNING STAT</label>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {ATTRIBUTES.map((attr) => (
+                <button
+                  type="button"
+                  key={attr.id}
+                  onClick={() => {
+                    soundEngine.playJump();
+                    setAttributeType(attr.id);
+                  }}
+                  className={`pixel-btn ${
+                    attributeType === attr.id ? "pixel-btn-gold text-black" : "pixel-btn-dark"
+                  } text-[8px] py-2 px-2 flex items-center gap-1.5`}
+                >
+                  <span>{attr.icon}</span>
+                  <span className="truncate">{attr.label}</span>
+                </button>
+              ))}
             </div>
           </div>
 
           {/* Recurrence & Duration */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                Cadence
-              </label>
+              <label className="block text-[#A0A0B0] mb-1.5">CADENCE</label>
               <select
                 value={repeatType}
                 onChange={(e) => setRepeatType(e.target.value as "NONE" | "DAILY" | "WEEKLY")}
-                className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-xs focus:border-amber-500 outline-none"
+                className="w-full px-2 py-2 bg-[#101018] border-2 border-black text-white font-pixel text-[8px] outline-none"
               >
-                <option value="DAILY">Daily Habit (Resets daily)</option>
-                <option value="NONE">One-Time Quest</option>
-                <option value="WEEKLY">Weekly Objective</option>
+                <option value="DAILY">DAILY HABIT</option>
+                <option value="NONE">ONE-TIME</option>
+                <option value="WEEKLY">WEEKLY</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                Est. Minutes
-              </label>
+              <label className="block text-[#A0A0B0] mb-1.5">EST. MINUTES</label>
               <input
                 type="number"
                 min={1}
                 max={720}
                 value={estimatedMinutes}
                 onChange={(e) => setEstimatedMinutes(parseInt(e.target.value, 10) || 15)}
-                className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-xs focus:border-amber-500 outline-none"
+                className="w-full px-2 py-2 bg-[#101018] border-2 border-black text-white font-pixel text-[8px] outline-none"
               />
             </div>
           </div>
@@ -231,17 +216,20 @@ export function CreateQuestModal({ isOpen, onClose, onQuestCreated }: CreateQues
           <div className="flex gap-3 pt-2">
             <button
               type="button"
-              onClick={onClose}
-              className="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition-colors"
+              onClick={() => {
+                soundEngine.playJump();
+                onClose();
+              }}
+              className="pixel-btn pixel-btn-dark flex-1 text-[9px] py-2.5"
             >
-              Cancel
+              CANCEL
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-xs tracking-wide shadow-md shadow-amber-500/20 flex items-center justify-center gap-1.5 active:scale-95 disabled:opacity-50"
+              className="pixel-btn pixel-btn-green flex-1 text-[9px] py-2.5"
             >
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Commit to Quest Log"}
+              {loading ? "SCRIBING..." : "★ COMMIT TRIAL ★"}
             </button>
           </div>
         </form>
