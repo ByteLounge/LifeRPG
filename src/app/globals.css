@@ -1,0 +1,112 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #0B0F17;
+    --foreground: #F1F5F9;
+    --card: #111827;
+    --card-foreground: #F1F5F9;
+    --card-muted: #1E293B;
+    --popover: #111827;
+    --popover-foreground: #F1F5F9;
+    --primary: #F59E0B;
+    --primary-foreground: #0B0F17;
+    --secondary: #1E293B;
+    --secondary-foreground: #F1F5F9;
+    --muted: #1E293B;
+    --muted-foreground: #94A3B8;
+    --accent: #38BDF8;
+    --accent-foreground: #0B0F17;
+    --destructive: #EF4444;
+    --destructive-foreground: #F8FAFC;
+    --border: #1E293B;
+    --input: #1E293B;
+    --ring: #F59E0B;
+    --radius: 0.75rem;
+
+    /* RPG Attribute Theming */
+    --stat-strength: #EF4444;
+    --stat-intellect: #3B82F6;
+    --stat-discipline: #8B5CF6;
+    --stat-creativity: #EC4899;
+    --stat-vitality: #10B981;
+    --stat-social: #F97316;
+  }
+
+  .light {
+    --background: #F8FAFC;
+    --foreground: #0F172A;
+    --card: #FFFFFF;
+    --card-foreground: #0F172A;
+    --card-muted: #F1F5F9;
+    --popover: #FFFFFF;
+    --popover-foreground: #0F172A;
+    --primary: #D97706;
+    --primary-foreground: #FFFFFF;
+    --secondary: #E2E8F0;
+    --secondary-foreground: #0F172A;
+    --muted: #F1F5F9;
+    --muted-foreground: #64748B;
+    --accent: #0284C7;
+    --accent-foreground: #FFFFFF;
+    --destructive: #DC2626;
+    --destructive-foreground: #FFFFFF;
+    --border: #E2E8F0;
+    --input: #E2E8F0;
+    --ring: #D97706;
+  }
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom Scrollbar for RPG feel */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0B0F17;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1E293B;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* RPG Component Utility Classes */
+.rpg-border {
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
+}
+
+.rpg-glow-gold {
+  box-shadow: 0 0 20px -3px rgba(245, 158, 11, 0.35);
+}
+
+.rpg-glow-xp {
+  box-shadow: 0 0 20px -3px rgba(56, 189, 248, 0.35);
+}
+
+.rpg-glow-danger {
+  box-shadow: 0 0 20px -3px rgba(239, 68, 68, 0.35);
+}
+
+/* Keyboard Accessible Focus Styles */
+*:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
