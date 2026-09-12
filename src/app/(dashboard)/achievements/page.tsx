@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { Trophy, Award, Lock, CheckCircle2, Sparkles, Coins, Shield } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { soundEngine } from "@/lib/sound";
 
@@ -63,20 +62,19 @@ export default function AchievementsPage() {
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="font-pixel text-[9px] bg-red-600 text-white px-2 py-0.5 border border-black">
-                WORLD CLEAR
+                MILESTONES
               </span>
-              <span className="font-pixel text-[9px] text-yellow-900">STAR MEDAL COLLECTION</span>
             </div>
             <h1 className="font-pixel text-base sm:text-xl text-yellow-950 tracking-wider">
-              ★ HALL OF POWER STARS & TROPHIES ★
+              ★ ACHIEVEMENTS & BADGES ★
             </h1>
             <p className="font-retro text-xs text-yellow-900 mt-1">
-              Permanent 8-bit accolades celebrating your relentless habits and breakthrough trials!
+              Special milestones you unlock as you build habits, finish tasks, and keep streaks.
             </p>
           </div>
 
           <div className="px-3.5 py-2 pixel-box bg-slate-950 text-yellow-400 font-pixel text-xs border-2 border-black w-fit">
-            ⭐ {totalUnlocked} / {totalAvailable} STARS ({percentage}%)
+            ⭐ {totalUnlocked} / {totalAvailable} UNLOCKED ({percentage}%)
           </div>
         </div>
 
@@ -124,7 +122,7 @@ export default function AchievementsPage() {
                   <h3 className="font-pixel text-xs text-white truncate tracking-wide">{ach.name}</h3>
                   {ach.isUnlocked ? (
                     <span className="font-pixel text-[8px] bg-emerald-600 text-white px-2 py-0.5 border border-black shrink-0">
-                      ★ CLEARED!
+                      ★ UNLOCKED
                     </span>
                   ) : (
                     <span className="font-pixel text-[8px] bg-slate-800 text-slate-400 px-2 py-0.5 border border-slate-700 shrink-0">
@@ -145,7 +143,7 @@ export default function AchievementsPage() {
 
                   {ach.isUnlocked && ach.unlockedAt && (
                     <span className="font-retro text-slate-400">
-                      Cleared {formatDate(ach.unlockedAt)}
+                      Unlocked {formatDate(ach.unlockedAt)}
                     </span>
                   )}
                 </div>

@@ -7,13 +7,13 @@ import { DomainQuest } from "@/server/repositories/types";
 import { CreateQuestModal } from "@/components/quests/CreateQuestModal";
 import { soundEngine } from "@/lib/sound";
 
-const ATTR_ICONS: Record<string, string> = {
-  INTELLECT: "📜",
-  STRENGTH: "💪",
-  DISCIPLINE: "🔥",
-  CREATIVITY: "🎨",
-  VITALITY: "🍄",
-  SOCIAL: "🤝",
+const ATTR_INFO: Record<string, { label: string; icon: string }> = {
+  INTELLECT: { label: "Intellect", icon: "🧠" },
+  STRENGTH: { label: "Strength", icon: "💥" },
+  DISCIPLINE: { label: "Discipline", icon: "🔥" },
+  CREATIVITY: { label: "Creativity", icon: "🎨" },
+  VITALITY: { label: "Vitality", icon: "❤️" },
+  SOCIAL: { label: "Social", icon: "🤝" },
 };
 
 export default function QuestsPage() {
@@ -68,7 +68,7 @@ export default function QuestsPage() {
   const handleDelete = async (questId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     soundEngine.playJump();
-    if (!confirm("Banish this trial from your journal?")) return;
+    if (!confirm("Are you sure you want to delete this task?")) return;
 
     try {
       const res = await fetch(`/api/quests/${questId}`, { method: "DELETE" });
@@ -101,10 +101,10 @@ export default function QuestsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b-4 border-black">
         <div>
           <h1 className="text-xl md:text-2xl font-black text-[#FBD000] drop-shadow-[2px_2px_0_#000] flex items-center gap-2.5">
-            <span>⚔️ TRIAL LOG & JOURNAL</span>
+            <span>✅ TASKS & HABITS</span>
           </h1>
           <p className="font-retro text-xs text-slate-400 mt-1">
-            Conquer your daily challenges and build legendary stats.
+            Track and complete your daily habits, study goals, and to-dos.
           </p>
         </div>
 
@@ -115,40 +115,40 @@ export default function QuestsPage() {
           }}
           className="pixel-btn pixel-btn-green text-[10px] py-2.5 px-4"
         >
-          + SCRIBE TRIAL
+          + NEW TASK
         </button>
       </div>
 
       {/* Filter Controls */}
-      <div className="flex flex-col md:flex-row gap-3">
+      <div className="flex flex-col md:flex-row gap-3 font-retro">
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="SEARCH LOG BY KEYWORD..."
-          className="flex-1 px-3 py-2.5 bg-[#101018] border-2 border-black text-white placeholder-slate-600 text-[10px] font-pixel outline-none focus:border-[#FBD000]"
+          placeholder="Search tasks by name..."
+          className="flex-1 px-3 py-2.5 bg-[#101018] border-2 border-black text-white placeholder-slate-600 text-xs outline-none focus:border-[#FBD000]"
         />
 
         <select
           value={difficultyFilter}
           onChange={(e) => setDifficultyFilter(e.target.value)}
-          className="px-3 py-2.5 bg-[#202030] border-2 border-black text-white text-[9px] font-pixel outline-none"
+          className="px-3 py-2.5 bg-[#202030] border-2 border-black text-white text-xs outline-none"
         >
-          <option value="ALL">ALL CHALLENGES</option>
-          <option value="EASY">EASY</option>
-          <option value="MEDIUM">MEDIUM</option>
-          <option value="HARD">HARD</option>
-          <option value="EPIC">EPIC</option>
+          <option value="ALL">All Difficulties</option>
+          <option value="EASY">Easy</option>
+          <option value="MEDIUM">Medium</option>
+          <option value="HARD">Hard</option>
+          <option value="EPIC">Epic</option>
         </select>
 
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-3 py-2.5 bg-[#202030] border-2 border-black text-white text-[9px] font-pixel outline-none"
+          className="px-3 py-2.5 bg-[#202030] border-2 border-black text-white text-xs outline-none"
         >
-          <option value="ALL">ALL STATUSES</option>
-          <option value="ACTIVE">ACTIVE ONLY</option>
-          <option value="COMPLETED">CLEARED ONLY</option>
+          <option value="ALL">All Statuses</option>
+          <option value="ACTIVE">Active Only</option>
+          <option value="COMPLETED">Completed Only</option>
         </select>
       </div>
 
@@ -162,13 +162,14 @@ export default function QuestsPage() {
       ) : filteredQuests.length === 0 ? (
         <div className="p-12 pixel-box text-center space-y-3">
           <span className="text-3xl">🍄</span>
-          <h3 className="text-xs font-bold text-white">NO TRIALS MATCH YOUR SEARCH</h3>
+          <h3 className="text-xs font-bold text-white">NO TASKS FOUND</h3>
+          <p className="font-retro text-xs text-slate-400">Try changing your search or filter above.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filteredQuests.map((q) => {
             const isCompleted = q.completedToday || q.status === "COMPLETED";
-            const icon = ATTR_ICONS[q.attributeType] || "⚔️";
+            const attr = ATTR_INFO[q.attributeType] || { label: q.attributeType, icon: "⚔️" };
 
             return (
               <div
@@ -197,7 +198,7 @@ export default function QuestsPage() {
                       </span>
 
                       <span className="text-[9px] text-[#FBD000]">
-                        {icon} {q.attributeType}
+                        {attr.icon} {attr.label}
                       </span>
                     </div>
 
@@ -206,14 +207,14 @@ export default function QuestsPage() {
                         href={`/quests/${q.id}`}
                         onClick={() => soundEngine.playJump()}
                         className="pixel-btn pixel-btn-dark text-[8px] py-1 px-1.5"
-                        title="Inspect Trial"
+                        title="View Task Details"
                       >
                         🔍
                       </Link>
                       <button
                         onClick={(e) => handleDelete(q.id, e)}
                         className="pixel-btn pixel-btn-red text-[8px] py-1 px-1.5"
-                        title="Banish Trial"
+                        title="Delete Task"
                       >
                         ✕
                       </button>
@@ -225,7 +226,7 @@ export default function QuestsPage() {
                       isCompleted ? "line-through text-[#608060]" : "text-white"
                     }`}
                   >
-                    {q.title.toUpperCase()}
+                    {q.title}
                   </h3>
 
                   {q.description && (
@@ -254,7 +255,7 @@ export default function QuestsPage() {
                       isCompleted ? "pixel-btn-dark opacity-60 cursor-default" : "pixel-btn-gold"
                     } text-[8px] py-1.5 px-3`}
                   >
-                    {isCompleted ? "✓ CLEARED" : "★ FULFILL ★"}
+                    {isCompleted ? "✓ COMPLETED" : "★ COMPLETE ★"}
                   </button>
                 </div>
               </div>

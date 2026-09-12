@@ -8,13 +8,13 @@ import { useRouter } from "next/navigation";
 import { soundEngine } from "@/lib/sound";
 
 const NAV_ITEMS = [
-  { href: "/dashboard", label: "OVERWORLD", icon: "🗺️" },
-  { href: "/quests", label: "TRIALS & QUESTS", icon: "⚔️" },
-  { href: "/character", label: "HERO STATUS", icon: "🍄" },
-  { href: "/inventory", label: "ITEM BAG", icon: "🎒" },
-  { href: "/shop", label: "TOAD'S SHOP", icon: "🏰" },
-  { href: "/achievements", label: "STAR MEDALS", icon: "⭐" },
-  { href: "/history", label: "CHRONICLE", icon: "📜" },
+  { href: "/dashboard", label: "DASHBOARD", icon: "🗺️" },
+  { href: "/quests", label: "MY TASKS", icon: "✅" },
+  { href: "/character", label: "PROFILE & SKILLS", icon: "🍄" },
+  { href: "/inventory", label: "BACKPACK", icon: "🎒" },
+  { href: "/shop", label: "ITEM SHOP", icon: "🏪" },
+  { href: "/achievements", label: "ACHIEVEMENTS", icon: "⭐" },
+  { href: "/history", label: "HISTORY", icon: "📜" },
   { href: "/settings", label: "SETTINGS", icon: "⚙️" },
 ];
 
@@ -56,9 +56,9 @@ export function Sidebar() {
               👑
             </div>
             <div className="overflow-hidden">
-              <div className="text-[10px] font-black truncate">{character.name.toUpperCase()}</div>
+              <div className="text-[10px] font-black truncate">{character.name}</div>
               <div className="text-[9px] font-bold text-[#884400]">
-                LEVEL {character.level} HERO
+                LEVEL {character.level}
               </div>
             </div>
           </div>
@@ -88,13 +88,13 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Warp Pipe / Exit Realm */}
+      {/* Log Out */}
       <div className="p-3 border-t-4 border-black bg-[#181820]">
         <button
           onClick={handleLogout}
           className="pixel-btn pixel-btn-red w-full text-[9px] py-2"
         >
-          <span>🚪 EXIT REALM</span>
+          <span>🚪 LOG OUT</span>
         </button>
       </div>
     </aside>

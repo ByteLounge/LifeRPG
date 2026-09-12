@@ -51,7 +51,7 @@ export default function ShopPage() {
     if ((character?.gold || 0) < item.price) {
       soundEngine.playJump();
       setToast({
-        text: `NEED MORE COINS! PRICE: ${item.price} G, YOU HAVE: ${character?.gold || 0} G`,
+        text: `Not enough coins! You need ${item.price} coins, but you have ${character?.gold || 0}.`,
         type: "error",
       });
       return;
@@ -68,17 +68,17 @@ export default function ShopPage() {
 
       const json = await res.json();
       if (!res.ok || !json.success) {
-        setToast({ text: json.error?.message || "PURCHASE FAILED.", type: "error" });
+        setToast({ text: json.error?.message || "Purchase failed.", type: "error" });
         return;
       }
 
       soundEngine.playCoin();
       spendGoldOptimistic(item.price);
-      setToast({ text: `ACQUIRED ${item.name}! STORED IN BAG.`, type: "success" });
+      setToast({ text: `Bought ${item.name}! Added to your backpack.`, type: "success" });
       await fetchCatalog();
       await refreshGameData();
     } catch {
-      setToast({ text: "WARP ERROR DURING PURCHASE.", type: "error" });
+      setToast({ text: "Connection error during purchase.", type: "error" });
     } finally {
       setPurchasingId(null);
     }
@@ -91,31 +91,31 @@ export default function ShopPage() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 select-none font-pixel">
-      {/* Toad's Shop Header Banner */}
+      {/* Header Banner */}
       <div className="p-6 bg-[#E52521] border-4 border-black text-white shadow-[0_6px_0_#000] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
-          <div className="text-[9px] text-[#FBD000] font-bold">★ TOAD&apos;S ITEM SHOP ★</div>
+          <div className="text-[9px] text-[#FBD000] font-bold">★ IN-GAME SHOP ★</div>
           <h1 className="text-lg md:text-2xl font-black drop-shadow-[2px_2px_0_#000]">
-            POWER-UP BAZAAR
+            ITEM SHOP
           </h1>
           <p className="font-retro text-xs text-white/90">
-            Trade your hard-earned gold coins for cosmetic frames and prestige titles!
+            Spend your earned coins on fun avatar borders, titles, and themes. No real money needed!
           </p>
         </div>
 
         <div className="p-3 bg-black border-2 border-white shadow-[2px_2px_0_#000] flex items-center gap-2 self-start sm:self-auto">
           <span className="text-xl pixel-coin-spin">🪙</span>
           <div>
-            <div className="text-[8px] text-[#A0A0B0]">COIN PURSE</div>
+            <div className="text-[8px] text-[#A0A0B0]">YOUR BALANCE</div>
             <div className="text-sm font-bold text-[#FBD000]">
-              {formatNumber(character?.gold || 0)} G
+              {formatNumber(character?.gold || 0)} Coins
             </div>
           </div>
         </div>
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 font-retro text-xs">
         {["ALL", "AVATAR_FRAME", "TITLE", "THEME", "BADGE"].map((type) => (
           <button
             key={type}
@@ -180,16 +180,16 @@ export default function ShopPage() {
                     </span>
                   </div>
 
-                  <h3 className="text-xs font-bold text-white mb-1">{item.name.toUpperCase()}</h3>
+                  <h3 className="text-xs font-bold text-white mb-1">{item.name}</h3>
                   <p className="font-retro text-xs text-slate-300 leading-relaxed line-clamp-2">
                     {item.description}
                   </p>
                 </div>
 
                 <div className="pt-2 border-t-2 border-black flex items-center justify-between text-[9px]">
-                  <div className="text-[#FBD000] font-bold flex items-center gap-1">
+                  <div className="text-[#FBD000] font-bold flex items-center gap-1 font-retro">
                     <span className="pixel-coin-spin">🪙</span>
-                    <span>{item.price} G</span>
+                    <span>{item.price} Coins</span>
                   </div>
 
                   <button
@@ -203,7 +203,7 @@ export default function ShopPage() {
                         : "pixel-btn-dark opacity-50 cursor-not-allowed"
                     } text-[8px] py-1.5 px-2.5`}
                   >
-                    {isPurchasing ? "..." : item.isOwned ? "✓ OWNED" : canAfford ? "★ BUY" : "NEED G"}
+                    {isPurchasing ? "..." : item.isOwned ? "✓ OWNED" : canAfford ? "BUY" : "NEED COINS"}
                   </button>
                 </div>
               </div>

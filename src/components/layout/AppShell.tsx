@@ -6,6 +6,7 @@ import { TopBar } from "./TopBar";
 import { MobileNav } from "./MobileNav";
 import { LevelUpModal } from "@/components/progression/LevelUpModal";
 import { ToastNotification } from "@/components/ui/ToastNotification";
+import { MarioGuide } from "@/components/ui/MarioGuide";
 import { useGame } from "@/components/providers/GameProvider";
 import { usePathname, useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
@@ -35,6 +36,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     return (
       <div className="min-h-screen bg-[#0B0F17] text-slate-100 flex flex-col">
         {children}
+        <MarioGuide />
         <ToastNotification />
       </div>
     );
@@ -60,6 +62,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <main className="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full">{children}</main>
       </div>
       <MobileNav />
+      <MarioGuide />
       <LevelUpModal />
       <ToastNotification />
     </div>

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { History, Shield, Sparkles, Coins, Trophy, ShoppingBag, CheckCircle2 } from "lucide-react";
 import { formatDateTime } from "@/lib/utils";
 import { soundEngine } from "@/lib/sound";
 
@@ -45,36 +44,35 @@ export default function HistoryPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      {/* 8-bit NES Arcade Chronicle Header */}
+      {/* Header */}
       <div className="pixel-box-green p-4 md:p-6 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="font-pixel text-[9px] bg-yellow-400 text-slate-950 px-2 py-0.5 border border-black font-bold">
-              ARCADE LEDGER
+              TIMELINE
             </span>
-            <span className="font-pixel text-[9px] text-emerald-200">WORLD CHRONICLES</span>
           </div>
           <h1 className="font-pixel text-base sm:text-xl text-yellow-300 tracking-wider">
-            HIGH-SCORE AUDIT & LOG
+            ACTIVITY HISTORY
           </h1>
           <p className="font-retro text-xs text-emerald-100 mt-1">
-            Authoritative chronological record of all quest completions, 1-UPs, and bazaar trades.
+            A chronological timeline of all your completed tasks, level-ups, and shop purchases.
           </p>
         </div>
 
         <div className="font-pixel text-xs bg-emerald-950 px-3 py-2 border-2 border-emerald-400 text-emerald-300 w-fit">
-          {ledger.length} ENTRIES RECORDED
+          {ledger.length} EVENTS RECORDED
         </div>
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 font-retro text-xs">
         {[
-          { id: "ALL", label: "★ ALL EVENTS" },
-          { id: "QUEST_COMPLETED", label: "🚩 QUESTS" },
-          { id: "LEVEL_UP", label: "🍄 1-UPs" },
-          { id: "ACHIEVEMENT_UNLOCKED", label: "⭐ STARS" },
-          { id: "SHOP_PURCHASE", label: "🏪 SHOP" },
+          { id: "ALL", label: "ALL EVENTS" },
+          { id: "QUEST_COMPLETED", label: "TASKS DONE" },
+          { id: "LEVEL_UP", label: "LEVEL UPS" },
+          { id: "ACHIEVEMENT_UNLOCKED", label: "ACHIEVEMENTS" },
+          { id: "SHOP_PURCHASE", label: "SHOP BUYS" },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -102,10 +100,9 @@ export default function HistoryPage() {
       ) : filteredLedger.length === 0 ? (
         <div className="pixel-box p-12 bg-[#181824] border-2 border-dashed border-slate-700 text-center space-y-3">
           <div className="text-3xl">📜</div>
-          <h3 className="font-pixel text-sm text-yellow-400">NO CHRONICLE ENTRIES YET!</h3>
+          <h3 className="font-pixel text-sm text-yellow-400">NO ACTIVITY YET</h3>
           <p className="font-retro text-xs text-slate-400 max-w-sm mx-auto">
-            As you fulfill quest trials, level up, and trade at Toad&apos;s shop, your ledger will record
-            every milestone.
+            Complete your first daily task to start your activity timeline!
           </p>
         </div>
       ) : (
@@ -117,7 +114,7 @@ export default function HistoryPage() {
               className="pixel-box p-4 bg-[#181824] border-2 border-slate-700 flex items-center justify-between gap-4 cursor-pointer hover:border-yellow-400 transition-all select-none"
             >
               <div className="flex items-center gap-3.5">
-                {/* 8-bit Icon Badge */}
+                {/* Icon Badge */}
                 <div
                   className={`w-10 h-10 border-2 border-black flex items-center justify-center text-lg shrink-0 ${
                     item.type === "QUEST_COMPLETED"
@@ -145,7 +142,7 @@ export default function HistoryPage() {
               </div>
 
               <div className="text-right shrink-0">
-                <div className="font-pixel text-[9px] text-slate-400">
+                <div className="font-pixel text-[9px] text-slate-400 font-retro">
                   {formatDateTime(item.timestamp)}
                 </div>
                 {item.xpEarned && item.xpEarned > 0 && (

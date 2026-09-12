@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Settings, Volume2, VolumeX, Moon, Sun, Globe, LogOut, Check, Sparkles, User } from "lucide-react";
+import { LogOut, Check } from "lucide-react";
 import { useGame } from "@/components/providers/GameProvider";
 import { useRouter } from "next/navigation";
 import { soundEngine } from "@/lib/sound";
@@ -36,7 +36,7 @@ export default function SettingsPage() {
 
     try {
       setTheme(selectedTheme);
-      setToast({ text: "★ CONFIGURATION SAVED! ★", type: "success" });
+      setToast({ text: "Settings saved successfully!", type: "success" });
     } catch {
       soundEngine.playPowerDown();
       setToast({ text: "Failed to update settings.", type: "error" });
@@ -58,20 +58,19 @@ export default function SettingsPage() {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="font-pixel text-[9px] bg-yellow-400 text-slate-950 px-2 py-0.5 border border-black font-bold">
-              PAUSE MENU
+              PREFERENCES
             </span>
-            <span className="font-pixel text-[9px] text-yellow-200">ARCADE CONFIG</span>
           </div>
           <h1 className="font-pixel text-base sm:text-xl text-yellow-300 tracking-wider">
-            OPTIONS & SOUND TEST
+            SETTINGS & SOUND
           </h1>
           <p className="font-retro text-xs text-red-100 mt-1">
-            Configure retro 8-bit synthesizer audio, realm graphics, and timezone boundaries.
+            Configure sound effects, screen theme, and your local timezone.
           </p>
         </div>
 
         <div className="font-pixel text-xs bg-red-950 px-3 py-2 border-2 border-yellow-400 text-yellow-300 w-fit">
-          ⚙️ OPTIONS
+          ⚙️ SETTINGS
         </div>
       </div>
 
@@ -82,10 +81,10 @@ export default function SettingsPage() {
             <div>
               <h3 className="font-pixel text-xs text-yellow-400 flex items-center gap-2">
                 <span>🔊</span>
-                <span>8-BIT CHIPTUNE AUDIO & SOUND TEST</span>
+                <span>8-BIT RETRO SOUND EFFECTS</span>
               </h3>
               <p className="font-retro text-xs text-slate-300 mt-1">
-                Procedural Web Audio square wave synthesizer for authentic 1985 arcade tones!
+                Authentic retro chiptune sound effects play when you complete tasks and level up.
               </p>
             </div>
 
@@ -100,7 +99,7 @@ export default function SettingsPage() {
                 soundEnabled ? "pixel-btn-green text-white" : "pixel-btn-red text-white"
               }`}
             >
-              {soundEnabled ? "AUDIO: ENABLED" : "AUDIO: MUTED"}
+              {soundEnabled ? "SOUND: ON" : "SOUND: MUTED"}
             </button>
           </div>
 
@@ -141,7 +140,7 @@ export default function SettingsPage() {
                 onClick={() => soundEngine.playQuestComplete()}
                 className="font-pixel text-[8px] px-2.5 py-1.5 bg-emerald-500 text-white border border-black hover:bg-emerald-400 active:translate-y-0.5"
               >
-                🚩 STAGE CLEAR
+                🚩 TASK COMPLETE
               </button>
               <button
                 type="button"
@@ -159,15 +158,15 @@ export default function SettingsPage() {
           <div>
             <h3 className="font-pixel text-xs text-yellow-400 flex items-center gap-2">
               <span>🎨</span>
-              <span>REALM PALETTE</span>
+              <span>SCREEN THEME</span>
             </h3>
-            <p className="font-retro text-xs text-slate-300 mt-1">Choose your game screen backdrop.</p>
+            <p className="font-retro text-xs text-slate-300 mt-1">Choose your preferred visual style.</p>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             {[
-              { id: "dark", label: "ARCANE OBSIDIAN", desc: "Dark fantasy canvas with retro neon pixel accents" },
-              { id: "light", label: "SOLAR PARCHMENT", desc: "Daylight overworld palette with amber accents" },
+              { id: "dark", label: "DARK THEME", desc: "Dark background with vibrant retro neon colors" },
+              { id: "light", label: "LIGHT THEME", desc: "Bright overworld background for daytime use" },
             ].map((t) => {
               const isSelected = selectedTheme === t.id;
               return (
@@ -193,22 +192,22 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* Timezone & Streak Boundaries */}
+        {/* Timezone */}
         <div className="pixel-box p-6 bg-[#181824] border-2 border-slate-700 space-y-4">
           <div>
             <h3 className="font-pixel text-xs text-yellow-400 flex items-center gap-2">
               <span>🌍</span>
-              <span>DAILY STREAK TIMEZONE</span>
+              <span>LOCAL TIMEZONE</span>
             </h3>
             <p className="font-retro text-xs text-slate-300 mt-1">
-              Determines calendar midnight for daily challenge resets and streak continuity.
+              Determines midnight for daily task resets and keeping your daily streak active.
             </p>
           </div>
 
           <select
             value={timezone}
             onChange={(e) => setTimezone(e.target.value)}
-            className="w-full px-3.5 py-2.5 bg-slate-900 border-2 border-slate-700 text-yellow-300 font-pixel text-xs focus:border-yellow-400 outline-none"
+            className="w-full px-3.5 py-2.5 bg-slate-900 border-2 border-slate-700 text-yellow-300 font-retro text-xs focus:border-yellow-400 outline-none"
           >
             {TIMEZONES.map((tz) => (
               <option key={tz} value={tz}>
@@ -226,7 +225,7 @@ export default function SettingsPage() {
             className="pixel-btn pixel-btn-red font-pixel text-[9px] px-4 py-3 text-white flex items-center gap-2 w-full sm:w-auto justify-center"
           >
             <LogOut className="w-4 h-4" />
-            <span>ABANDON SESSION (LOG OUT)</span>
+            <span>LOG OUT</span>
           </button>
 
           <button
@@ -234,7 +233,7 @@ export default function SettingsPage() {
             className="pixel-btn pixel-btn-yellow font-pixel text-[10px] px-6 py-3 text-slate-950 flex items-center gap-2 w-full sm:w-auto justify-center"
           >
             {saved ? <Check className="w-4 h-4" /> : <span>💾</span>}
-            <span>{saved ? "CONFIG SAVED!" : "SAVE CONFIGURATION"}</span>
+            <span>{saved ? "SETTINGS SAVED!" : "SAVE SETTINGS"}</span>
           </button>
         </div>
       </form>

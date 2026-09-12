@@ -218,3 +218,63 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #FBD000;
 }
+
+/* 2D Mario Character Guide Animations */
+@keyframes mario-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+@keyframes mario-walk {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(12px); }
+}
+
+@keyframes mario-jump {
+  0% { transform: translateY(0) scale(1, 1); }
+  35% { transform: translateY(-28px) scale(0.9, 1.15); }
+  65% { transform: translateY(-28px) scale(0.9, 1.15); }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+
+.animate-mario-bob {
+  animation: mario-bob 1.6s ease-in-out infinite;
+}
+
+.animate-mario-jump {
+  animation: mario-jump 0.5s ease-out;
+}
+
+/* Retro Speech Bubble with Pixel Tail */
+.pixel-bubble {
+  position: relative;
+  background-color: #FFFFFF;
+  color: #000000;
+  border: 3px solid #000000;
+  box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 0.75);
+}
+
+.pixel-bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  right: 28px;
+  border-width: 10px 10px 0;
+  border-style: solid;
+  border-color: #FFFFFF transparent;
+  display: block;
+  width: 0;
+}
+
+.pixel-bubble::before {
+  content: "";
+  position: absolute;
+  bottom: -14px;
+  right: 26px;
+  border-width: 14px 14px 0;
+  border-style: solid;
+  border-color: #000000 transparent;
+  display: block;
+  width: 0;
+}
+

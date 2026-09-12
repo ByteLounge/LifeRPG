@@ -9,13 +9,13 @@ import { formatNumber } from "@/lib/utils";
 import { getAttributeLevelFromXP } from "@/lib/game-engine/progression";
 import { soundEngine } from "@/lib/sound";
 
-const ATTR_ICONS: Record<string, string> = {
-  INTELLECT: "📜",
-  STRENGTH: "💪",
-  DISCIPLINE: "🔥",
-  CREATIVITY: "🎨",
-  VITALITY: "🍄",
-  SOCIAL: "🤝",
+const ATTR_INFO: Record<string, { label: string; icon: string }> = {
+  INTELLECT: { label: "Intellect", icon: "🧠" },
+  STRENGTH: { label: "Strength", icon: "💥" },
+  DISCIPLINE: { label: "Discipline", icon: "🔥" },
+  CREATIVITY: { label: "Creativity", icon: "🎨" },
+  VITALITY: { label: "Vitality", icon: "❤️" },
+  SOCIAL: { label: "Social", icon: "🤝" },
 };
 
 export default function DashboardPage() {
@@ -80,53 +80,53 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6 select-none font-pixel">
-      {/* 2D Mario Stage Header Card */}
+      {/* Top Welcome Card */}
       <section className="p-6 md:p-8 pixel-box bg-[#101018] text-white">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <span className="bg-[#E52521] border-2 border-black text-white text-[9px] px-2 py-0.5 font-bold">
-                STAGE 1-{character?.level || 1}
+                LEVEL {character?.level || 1}
               </span>
               {character?.equippedTitleId && (
                 <span className="text-[9px] text-[#FBD000]">
-                  ★ {character.equippedTitleId.toUpperCase()} ★
+                  ★ {character.equippedTitleId} ★
                 </span>
               )}
             </div>
 
             <h1 className="text-xl md:text-2xl font-black text-[#FBD000] drop-shadow-[2px_2px_0_#000]">
-              {character?.name.toUpperCase() || "PLAYER 1"}
+              {character?.name || "Player 1"}
             </h1>
 
             <p className="font-retro text-xs md:text-sm text-slate-300 max-w-xl">
-              Fulfill your daily trials to power up stats and collect shiny gold coins!
+              Complete your daily tasks and habits to level up your skills and collect coins!
             </p>
           </div>
 
-          {/* Retro Stat Blocks */}
+          {/* Quick Stat Blocks */}
           <div className="flex flex-wrap items-center gap-3">
             <div className="p-3 bg-[#202030] border-2 border-black shadow-[3px_3px_0_#000] flex items-center gap-2.5">
               <span className="text-xl">🍄</span>
               <div>
-                <div className="text-[8px] text-[#A0A0B0]">HERO LEVEL</div>
-                <div className="text-sm font-bold text-[#FBD000]">LVL {character?.level || 1}</div>
+                <div className="text-[8px] text-[#A0A0B0]">CURRENT LEVEL</div>
+                <div className="text-sm font-bold text-[#FBD000]">Level {character?.level || 1}</div>
               </div>
             </div>
 
             <div className="p-3 bg-[#202030] border-2 border-black shadow-[3px_3px_0_#000] flex items-center gap-2.5">
               <span className="text-xl">🔥</span>
               <div>
-                <div className="text-[8px] text-[#A0A0B0]">FIRE STREAK</div>
-                <div className="text-sm font-bold text-[#E52521]">{streak?.currentStreak || 0} DAYS</div>
+                <div className="text-[8px] text-[#A0A0B0]">DAILY STREAK</div>
+                <div className="text-sm font-bold text-[#E52521]">{streak?.currentStreak || 0} Days</div>
               </div>
             </div>
 
             <div className="p-3 bg-[#202030] border-2 border-black shadow-[3px_3px_0_#000] flex items-center gap-2.5">
               <span className="text-xl pixel-coin-spin">🪙</span>
               <div>
-                <div className="text-[8px] text-[#A0A0B0]">COIN TREASURY</div>
-                <div className="text-sm font-bold text-[#FBD000]">{formatNumber(character?.gold || 0)} G</div>
+                <div className="text-[8px] text-[#A0A0B0]">EARNED COINS</div>
+                <div className="text-sm font-bold text-[#FBD000]">{formatNumber(character?.gold || 0)}</div>
               </div>
             </div>
           </div>
@@ -135,8 +135,8 @@ export default function DashboardPage() {
         {/* Stepped Pixel XP Progress Bar */}
         {xpProgress && (
           <div className="mt-6 pt-6 border-t-2 border-[#303048]">
-            <div className="flex justify-between text-[10px] text-[#A0A0B0] mb-1.5">
-              <span>EXP TO NEXT LEVEL</span>
+            <div className="flex justify-between text-[10px] text-[#A0A0B0] mb-1.5 font-retro">
+              <span>XP TO NEXT LEVEL</span>
               <span className="text-[#5C94FC] font-bold">
                 {xpProgress.currentProgressXP} / {xpProgress.xpNeededForNextLevel} XP ({xpProgress.percentage}%)
               </span>
@@ -148,15 +148,15 @@ export default function DashboardPage() {
         )}
       </section>
 
-      {/* Main Grid: Active Quests + Bonus Stage / Stats */}
+      {/* Main Grid: Active Tasks + Bonus Challenge */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left 2 Columns: Quests */}
+        {/* Left 2 Columns: Tasks List */}
         <section className="lg:col-span-2 space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <h2 className="text-sm md:text-base font-black text-white">TODAY&apos;S QUESTS</h2>
+              <h2 className="text-sm md:text-base font-black text-white">TODAY&apos;S TASKS</h2>
               <span className="bg-[#E52521] text-white text-[9px] px-2 py-0.5 border border-black">
-                {completedTodayCount}/{totalQuestsToday}
+                {completedTodayCount} / {totalQuestsToday} Done
               </span>
             </div>
 
@@ -167,7 +167,7 @@ export default function DashboardPage() {
               }}
               className="pixel-btn pixel-btn-green text-[9px] py-2 px-3"
             >
-              + NEW QUEST
+              + NEW TASK
             </button>
           </div>
 
@@ -180,16 +180,16 @@ export default function DashboardPage() {
           ) : quests.length === 0 ? (
             <div className="p-8 pixel-box text-center space-y-3">
               <span className="text-3xl">🍄</span>
-              <h3 className="text-xs font-bold text-white">NO QUESTS IN JOURNAL</h3>
+              <h3 className="text-xs font-bold text-white">NO TASKS ADDED YET</h3>
               <p className="font-retro text-xs text-slate-400 max-w-sm mx-auto">
-                Hit the &apos;+ NEW QUEST&apos; button to scribe your first real-world trial!
+                Click &apos;+ NEW TASK&apos; to add your daily habits, study goals, or gym workout!
               </p>
             </div>
           ) : (
             <div className="space-y-3">
               {quests.map((q) => {
                 const isCompleted = q.completedToday;
-                const icon = ATTR_ICONS[q.attributeType] || "⚔️";
+                const attr = ATTR_INFO[q.attributeType] || { label: q.attributeType, icon: "⚔️" };
 
                 return (
                   <div
@@ -201,7 +201,7 @@ export default function DashboardPage() {
                     }`}
                   >
                     <div className="flex items-start gap-3.5 flex-1 min-w-0">
-                      {/* Clickable Question Block Action */}
+                      {/* Clickable Action Button */}
                       <button
                         onClick={() => handleComplete(q.id)}
                         disabled={isCompleted || completingId === q.id}
@@ -210,7 +210,7 @@ export default function DashboardPage() {
                             ? "bg-[#00A800] text-white cursor-default"
                             : "bg-[#FBD000] text-black hover:scale-105 active:scale-95 shadow-[2px_2px_0_#000]"
                         }`}
-                        title={isCompleted ? "Course Cleared!" : "Hit to Complete!"}
+                        title={isCompleted ? "Completed!" : "Click to check off!"}
                       >
                         {isCompleted ? "✓" : "?"}
                       </button>
@@ -232,11 +232,11 @@ export default function DashboardPage() {
                           </span>
 
                           <span className="text-[9px] text-[#FBD000]">
-                            {icon} {q.attributeType}
+                            {attr.icon} {attr.label}
                           </span>
 
                           <span className="text-[8px] text-[#A0A0B0]">
-                            ⏱ {q.estimatedMinutes}M
+                            ⏱ {q.estimatedMinutes}m
                           </span>
                         </div>
 
@@ -245,7 +245,7 @@ export default function DashboardPage() {
                             isCompleted ? "line-through text-[#608060]" : "text-white"
                           }`}
                         >
-                          {q.title.toUpperCase()}
+                          {q.title}
                         </h3>
 
                         {q.description && (
@@ -273,22 +273,22 @@ export default function DashboardPage() {
           )}
         </section>
 
-        {/* Right Column: 2D Mario Bonus Stage & Attribute Power-ups */}
+        {/* Right Column: Daily Bonus & Skills Progress */}
         <div className="space-y-6">
-          {/* Bonus Stage Card */}
+          {/* Daily Bonus Goal Card */}
           <div className="p-5 question-block text-black shadow-[4px_4px_0_#000]">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[9px] font-black uppercase tracking-wider">
-                ★ BONUS STAGE ★
+                ★ DAILY BONUS GOAL ★
               </span>
               <span className="text-[9px] font-black">
                 {Math.min(dailyGoalTarget, completedTodayCount)} / {dailyGoalTarget}
               </span>
             </div>
 
-            <h3 className="text-xs font-black mb-1">TRIO CLEARED CHALLENGE</h3>
+            <h3 className="text-xs font-black mb-1">FINISH 3 TASKS TODAY</h3>
             <p className="font-retro text-xs text-[#502000] mb-3 leading-tight font-bold">
-              Hit 3 Quest Blocks today to unlock the secret star bonus!
+              Complete any 3 tasks today to earn an extra XP bonus!
             </p>
 
             <div className="pixel-bar-container bg-black mb-3">
@@ -299,37 +299,37 @@ export default function DashboardPage() {
             </div>
 
             <div className="text-[8px] font-black pt-2 border-t-2 border-black flex justify-between">
-              <span>PRIZE:</span>
-              <span className="text-[#E52521]">+100 EXP • +50 COINS</span>
+              <span>BONUS REWARD:</span>
+              <span className="text-[#E52521]">+100 XP • +50 COINS</span>
             </div>
           </div>
 
-          {/* Attributes Power-up Card */}
+          {/* Life Skills Card */}
           <div className="p-5 pixel-box space-y-4">
             <div className="flex items-center justify-between pb-2 border-b-2 border-black">
-              <h3 className="text-xs font-black text-white">HERO POWER-UPS</h3>
+              <h3 className="text-xs font-black text-white">YOUR 6 LIFE SKILLS</h3>
               <Link
                 href="/character"
                 onClick={() => soundEngine.playJump()}
                 className="text-[8px] text-[#FBD000] hover:underline"
               >
-                SHEET ▶
+                VIEW ALL ▶
               </Link>
             </div>
 
             <div className="space-y-3">
               {attributes.map((attr) => {
-                const icon = ATTR_ICONS[attr.type] || "🍄";
+                const info = ATTR_INFO[attr.type] || { label: attr.type, icon: "🍄" };
                 const calc = getAttributeLevelFromXP(attr.currentXp);
 
                 return (
                   <div key={attr.id} className="space-y-1">
                     <div className="flex items-center justify-between text-[9px]">
                       <span className="text-white flex items-center gap-1.5">
-                        <span>{icon}</span>
-                        <span>{attr.type}</span>
+                        <span>{info.icon}</span>
+                        <span>{info.label}</span>
                       </span>
-                      <span className="text-[#FBD000]">LVL {calc.level}</span>
+                      <span className="text-[#FBD000]">Level {calc.level}</span>
                     </div>
 
                     <div className="pixel-bar-container h-3.5">

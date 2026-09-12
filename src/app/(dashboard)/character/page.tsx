@@ -1,20 +1,6 @@
 "use client";
 
 import React from "react";
-import {
-  Shield,
-  Flame,
-  Coins,
-  Sparkles,
-  BookOpen,
-  Dumbbell,
-  Palette,
-  Heart,
-  Users,
-  Award,
-  Crown,
-  Volume2,
-} from "lucide-react";
 import { useGame } from "@/components/providers/GameProvider";
 import { getAttributeLevelFromXP } from "@/lib/game-engine/progression";
 import { formatNumber } from "@/lib/utils";
@@ -22,55 +8,49 @@ import { soundEngine } from "@/lib/sound";
 
 const ATTR_METADATA: Record<
   string,
-  { label: string; marioName: string; icon: string; color: string; barColor: string; desc: string }
+  { label: string; icon: string; color: string; barColor: string; desc: string }
 > = {
   INTELLECT: {
     label: "Intellect",
-    marioName: "BRAIN POWER",
     icon: "🧠",
     color: "text-blue-400",
     barColor: "bg-blue-500",
-    desc: "Study, coding logic, and mental trials",
+    desc: "Level up through study sessions, reading books, and coding practice.",
   },
   STRENGTH: {
     label: "Strength",
-    marioName: "JUMP ATTACK",
     icon: "💥",
     color: "text-red-400",
     barColor: "bg-red-500",
-    desc: "Physical fitness, workouts & stamina",
+    desc: "Level up through gym workouts, sports, running, and physical fitness.",
   },
   DISCIPLINE: {
     label: "Discipline",
-    marioName: "FIRE FLOW",
     icon: "🔥",
     color: "text-amber-400",
     barColor: "bg-amber-500",
-    desc: "Unbroken routines, early rising & habit fire",
+    desc: "Level up through daily habits, waking up early, and keeping streaks.",
   },
   CREATIVITY: {
     label: "Creativity",
-    marioName: "STAR SPARK",
     icon: "🎨",
     color: "text-pink-400",
     barColor: "bg-pink-500",
-    desc: "Design, writing, art & creative craft",
+    desc: "Level up through writing, designing, making music, and side projects.",
   },
   VITALITY: {
     label: "Vitality",
-    marioName: "MAX HP",
     icon: "❤️",
     color: "text-emerald-400",
     barColor: "bg-emerald-500",
-    desc: "Hydration, sleep, nutrition & recovery",
+    desc: "Level up through drinking water, eating healthy, and getting good sleep.",
   },
   SOCIAL: {
     label: "Social",
-    marioName: "BROS BOND",
     icon: "🤝",
     color: "text-orange-400",
     barColor: "bg-orange-500",
-    desc: "Mentoring, community & multiplayer harmony",
+    desc: "Level up through spending time with friends, family, and teamwork.",
   },
 };
 
@@ -89,20 +69,19 @@ export default function CharacterPage() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-8">
-      {/* 2D Mario RPG Header Banner */}
+      {/* Header Banner */}
       <div className="pixel-box-mario p-4 md:p-6 text-white flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="font-pixel text-[10px] text-yellow-300 bg-red-950/60 px-2 py-0.5 border border-yellow-400">
-              WORLD 1-STATUS
+              PROFILE & SKILLS
             </span>
-            <span className="font-pixel text-[10px] text-yellow-200">★ HERO ATTRIBUTES</span>
           </div>
           <h1 className="font-pixel text-base sm:text-xl text-yellow-300 tracking-wider">
-            MARIO RPG STATUS SHEET
+            YOUR PROFILE & LIFE SKILLS
           </h1>
           <p className="font-retro text-xs text-red-100 mt-1">
-            Real-world discipline calibrated into 8-bit hero power levels!
+            See how your real-world activities increase your 6 core life skills.
           </p>
         </div>
 
@@ -115,7 +94,7 @@ export default function CharacterPage() {
         </button>
       </div>
 
-      {/* Hero Avatar & Identity Card */}
+      {/* Avatar & Identity Card */}
       <div className="pixel-box p-6 md:p-8 bg-[#181824] space-y-6">
         <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
           {/* Avatar with Chunky Pixel Frame */}
@@ -123,21 +102,21 @@ export default function CharacterPage() {
             <div
               onClick={handlePowerUpAudio}
               className="w-28 h-28 pixel-box-gold flex flex-col items-center justify-center cursor-pointer hover:scale-105 active:scale-95 transition-transform"
-              title="Click for Power-Up Fanfare!"
+              title="Click to play power-up sound!"
             >
               <span className="text-5xl select-none">🍄</span>
-              <span className="font-pixel text-[8px] text-red-700 mt-1 font-bold">HERO</span>
+              <span className="font-pixel text-[8px] text-red-700 mt-1 font-bold">PLAYER</span>
             </div>
             <div className="mt-2 font-pixel text-[10px] bg-red-600 text-white px-2 py-1 border-2 border-black inline-block shadow-md">
               LVL {character.level}
             </div>
           </div>
 
-          {/* Hero Identity & Titles */}
+          {/* Hero Identity */}
           <div className="flex-1 text-center md:text-left space-y-3">
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
               <span className="font-pixel text-[9px] bg-yellow-400 text-slate-950 px-2 py-1 border-2 border-black">
-                {character.equippedTitleId || "SUPER ADVENTURER"}
+                {character.equippedTitleId || "ADVENTURER"}
               </span>
               <span className="font-pixel text-[9px] bg-sky-500 text-white px-2 py-1 border-2 border-black">
                 PLAYER 1
@@ -148,16 +127,15 @@ export default function CharacterPage() {
               {character.name}
             </h2>
 
-            <p className="text-xs text-slate-300 max-w-xl font-mono leading-relaxed">
-              Discipline Warrior of the Mushroom Realm. Fulfilling daily quests, dodging procrastination
-              goombas, and gathering gold coins to conquer life goals!
+            <p className="text-xs text-slate-300 max-w-xl font-retro leading-relaxed">
+              Leveling up daily habits, study goals, and health routines one task at a time.
             </p>
 
-            {/* Quick Metrics Bar (Chunky Arcade Badges) */}
+            {/* Quick Metrics Bar */}
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 pt-2">
               <div className="pixel-box px-3 py-1.5 bg-slate-900 border-2 border-sky-400 text-sky-400 font-pixel text-[10px] flex items-center gap-1.5">
                 <span>⭐</span>
-                <span>{formatNumber(character.totalXp)} LIFETIME XP</span>
+                <span>{formatNumber(character.totalXp)} TOTAL XP</span>
               </div>
               <div className="pixel-box px-3 py-1.5 bg-slate-900 border-2 border-yellow-400 text-yellow-400 font-pixel text-[10px] flex items-center gap-1.5">
                 <span className="pixel-coin-spin inline-block">🪙</span>
@@ -171,11 +149,11 @@ export default function CharacterPage() {
           </div>
         </div>
 
-        {/* Global Level Progression Bar */}
+        {/* Level Progression Bar */}
         <div className="p-4 bg-slate-900 border-2 border-slate-700 space-y-2">
           <div className="flex justify-between items-center font-pixel text-[10px]">
-            <span className="text-yellow-400">HERO LEVEL {character.level} PROGRESS</span>
-            <span className="text-emerald-400">
+            <span className="text-yellow-400">LEVEL {character.level} PROGRESS</span>
+            <span className="text-emerald-400 font-retro">
               {xpProgress?.currentProgressXP || 0} / {xpProgress?.xpNeededForNextLevel || 100} XP ({xpProgress?.percentage || 0}%)
             </span>
           </div>
@@ -186,20 +164,20 @@ export default function CharacterPage() {
             />
           </div>
           <p className="font-retro text-[11px] text-slate-400 text-right">
-            +{ (xpProgress?.xpNeededForNextLevel || 100) - (xpProgress?.currentProgressXP || 0) } XP until Level {character.level + 1} 1-UP!
+            +{ (xpProgress?.xpNeededForNextLevel || 100) - (xpProgress?.currentProgressXP || 0) } XP until Level {character.level + 1}
           </p>
         </div>
       </div>
 
-      {/* Attributes RPG Grid */}
+      {/* Attributes Grid */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="font-pixel text-sm text-yellow-400 flex items-center gap-2">
             <span>⚡</span>
-            <span>CORE ATTRIBUTE MATRIX</span>
+            <span>THE 6 CORE LIFE SKILLS</span>
           </h3>
           <span className="font-retro text-xs text-slate-400">
-            Powered by trial category completions
+            Earn XP in each skill by completing related tasks
           </span>
         </div>
 
@@ -219,27 +197,27 @@ export default function CharacterPage() {
                       {meta.icon}
                     </div>
                     <div>
-                      <div className="font-pixel text-[11px] text-yellow-300 tracking-wider">
-                        {meta.marioName}
+                      <div className="font-pixel text-xs text-yellow-300 tracking-wider">
+                        {meta.label}
                       </div>
                       <div className="text-[11px] text-slate-400 font-retro">
-                        {meta.label} • {formatNumber(attr.currentXp)} Total XP
+                        {formatNumber(attr.currentXp)} Total XP
                       </div>
                     </div>
                   </div>
 
                   <div className="text-right">
-                    <div className="font-pixel text-[8px] text-slate-400 uppercase">POWER RANK</div>
-                    <div className="font-pixel text-sm text-yellow-400">LV {calc.level}</div>
+                    <div className="font-pixel text-[8px] text-slate-400 uppercase">RANK</div>
+                    <div className="font-pixel text-sm text-yellow-400">Level {calc.level}</div>
                   </div>
                 </div>
 
-                <p className="text-[11px] text-slate-400 font-mono">{meta.desc}</p>
+                <p className="text-xs text-slate-300 font-retro leading-relaxed">{meta.desc}</p>
 
-                {/* Stepped Pixel Progress Bar */}
+                {/* Progress Bar */}
                 <div className="space-y-1">
                   <div className="flex justify-between font-pixel text-[8px] text-slate-400">
-                    <span>PROGRESS TO RANK {calc.level + 1}</span>
+                    <span>PROGRESS TO LEVEL {calc.level + 1}</span>
                     <span className="text-yellow-300">{calc.percentage}%</span>
                   </div>
                   <div className="w-full h-3 bg-slate-950 border-2 border-black overflow-hidden p-0.5">
@@ -255,17 +233,16 @@ export default function CharacterPage() {
         </div>
       </section>
 
-      {/* Mario Star Medals Section */}
-      <section className="pixel-box-gold p-6 text-slate-950 space-y-3">
+      {/* Streak Bonus Info */}
+      <section className="pixel-box-gold p-6 text-slate-950 space-y-2">
         <div className="flex items-center gap-2">
           <span className="text-2xl">🌟</span>
           <h3 className="font-pixel text-xs font-bold text-yellow-900 uppercase">
-            SUPER STAR STAT BONUS ACTIVE
+            DAILY STREAK BONUS ACTIVE
           </h3>
         </div>
         <p className="font-retro text-xs text-yellow-950 leading-relaxed">
-          Maintain your streak above 3 days to keep the Super Star invincibility boost flowing! All trial
-          completions yield bonus coins and accelerate your hero level ascension.
+          Keep your daily streak going above 3 days to earn bonus coins on every completed task!
         </p>
       </section>
     </div>

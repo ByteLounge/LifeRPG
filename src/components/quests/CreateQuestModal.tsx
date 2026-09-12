@@ -11,11 +11,11 @@ interface CreateQuestModalProps {
 }
 
 const ATTRIBUTES: Array<{ id: AttributeType; label: string; icon: string }> = [
+  { id: "INTELLECT", label: "INTELLECT", icon: "🧠" },
+  { id: "STRENGTH", label: "STRENGTH", icon: "💥" },
   { id: "DISCIPLINE", label: "DISCIPLINE", icon: "🔥" },
-  { id: "INTELLECT", label: "INTELLECT", icon: "📜" },
-  { id: "STRENGTH", label: "STRENGTH", icon: "💪" },
   { id: "CREATIVITY", label: "CREATIVITY", icon: "🎨" },
-  { id: "VITALITY", label: "VITALITY", icon: "🍄" },
+  { id: "VITALITY", label: "VITALITY", icon: "❤️" },
   { id: "SOCIAL", label: "SOCIAL", icon: "🤝" },
 ];
 
@@ -29,7 +29,7 @@ const DIFFICULTIES: Array<{ id: QuestDifficulty; label: string; xp: number; gold
 export function CreateQuestModal({ isOpen, onClose, onQuestCreated }: CreateQuestModalProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("Daily Routine");
+  const [category, setCategory] = useState("Daily Habits");
   const [difficulty, setDifficulty] = useState<QuestDifficulty>("MEDIUM");
   const [attributeType, setAttributeType] = useState<AttributeType>("DISCIPLINE");
   const [repeatType, setRepeatType] = useState<"NONE" | "DAILY" | "WEEKLY">("DAILY");
@@ -42,7 +42,7 @@ export function CreateQuestModal({ isOpen, onClose, onQuestCreated }: CreateQues
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) {
-      setError("Trial title cannot be blank!");
+      setError("Task title cannot be blank!");
       return;
     }
 
@@ -66,7 +66,7 @@ export function CreateQuestModal({ isOpen, onClose, onQuestCreated }: CreateQues
 
       const json = await res.json();
       if (!res.ok || !json.success) {
-        setError(json.error?.message || "Failed to scribe trial.");
+        setError(json.error?.message || "Failed to create task.");
         return;
       }
 
@@ -76,7 +76,7 @@ export function CreateQuestModal({ isOpen, onClose, onQuestCreated }: CreateQues
       onQuestCreated();
       onClose();
     } catch {
-      setError("Network warp error!");
+      setError("Network connection error!");
     } finally {
       setLoading(false);
     }
@@ -101,38 +101,38 @@ export function CreateQuestModal({ isOpen, onClose, onQuestCreated }: CreateQues
         </button>
 
         <div className="text-[9px] text-[#FBD000] uppercase mb-1">
-          ★ QUEST REGISTRY ★
+          ★ NEW TASK ENTRY ★
         </div>
         <h3 className="text-sm md:text-base font-black text-white mb-4">
-          SCRIBE NEW TRIAL
+          CREATE A NEW TASK
         </h3>
 
         {error && (
           <div className="mb-4 p-2.5 bg-[#E52521] border-2 border-black text-white text-[9px]">
-            ⚠ {error.toUpperCase()}
+            ⚠ {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4 text-[10px]">
           <div>
-            <label className="block text-[#A0A0B0] mb-1.5">TRIAL TITLE *</label>
+            <label className="block text-[#A0A0B0] mb-1.5 font-retro">TASK NAME *</label>
             <input
               type="text"
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. Read 20 pages"
+              placeholder="e.g. Study coding for 1 hour"
               maxLength={120}
-              className="w-full px-3 py-2.5 bg-[#101018] border-2 border-black text-white placeholder-slate-600 font-pixel text-[10px] outline-none focus:border-[#FBD000]"
+              className="w-full px-3 py-2.5 bg-[#101018] border-2 border-black text-white placeholder-slate-600 font-retro text-xs outline-none focus:border-[#FBD000]"
             />
           </div>
 
           <div>
-            <label className="block text-[#A0A0B0] mb-1.5">NOTES (OPTIONAL)</label>
+            <label className="block text-[#A0A0B0] mb-1.5 font-retro">NOTES OR DETAILS (OPTIONAL)</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Acceptance criteria or details..."
+              placeholder="e.g. Chapter 4 and practice problems..."
               rows={2}
               maxLength={500}
               className="w-full px-3 py-2 bg-[#101018] border-2 border-black text-white placeholder-slate-600 font-retro text-xs outline-none focus:border-[#FBD000] resize-none"
@@ -141,7 +141,7 @@ export function CreateQuestModal({ isOpen, onClose, onQuestCreated }: CreateQues
 
           {/* Difficulty Selection */}
           <div>
-            <label className="block text-[#A0A0B0] mb-1.5">DIFFICULTY & PRIZE</label>
+            <label className="block text-[#A0A0B0] mb-1.5 font-retro">DIFFICULTY & REWARDS</label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {DIFFICULTIES.map((d) => (
                 <button
@@ -156,7 +156,7 @@ export function CreateQuestModal({ isOpen, onClose, onQuestCreated }: CreateQues
                   } text-[8px] py-2 px-1 flex flex-col items-center justify-center`}
                 >
                   <span className="font-bold">{d.label}</span>
-                  <span className="text-[7px] mt-0.5">+{d.xp}XP / +{d.gold}G</span>
+                  <span className="text-[7px] mt-0.5">+{d.xp} XP / +{d.gold} Coins</span>
                 </button>
               ))}
             </div>
@@ -164,7 +164,7 @@ export function CreateQuestModal({ isOpen, onClose, onQuestCreated }: CreateQues
 
           {/* Governing Attribute */}
           <div>
-            <label className="block text-[#A0A0B0] mb-1.5">GOVERNING STAT</label>
+            <label className="block text-[#A0A0B0] mb-1.5 font-retro">SKILL TO LEVEL UP</label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {ATTRIBUTES.map((attr) => (
                 <button
@@ -188,27 +188,27 @@ export function CreateQuestModal({ isOpen, onClose, onQuestCreated }: CreateQues
           {/* Recurrence & Duration */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-[#A0A0B0] mb-1.5">CADENCE</label>
+              <label className="block text-[#A0A0B0] mb-1.5 font-retro">HOW OFTEN?</label>
               <select
                 value={repeatType}
                 onChange={(e) => setRepeatType(e.target.value as "NONE" | "DAILY" | "WEEKLY")}
-                className="w-full px-2 py-2 bg-[#101018] border-2 border-black text-white font-pixel text-[8px] outline-none"
+                className="w-full px-2 py-2 bg-[#101018] border-2 border-black text-white font-retro text-xs outline-none"
               >
                 <option value="DAILY">DAILY HABIT</option>
-                <option value="NONE">ONE-TIME</option>
-                <option value="WEEKLY">WEEKLY</option>
+                <option value="NONE">ONE-TIME TO-DO</option>
+                <option value="WEEKLY">WEEKLY GOAL</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-[#A0A0B0] mb-1.5">EST. MINUTES</label>
+              <label className="block text-[#A0A0B0] mb-1.5 font-retro">ESTIMATED MINUTES</label>
               <input
                 type="number"
                 min={1}
                 max={720}
                 value={estimatedMinutes}
                 onChange={(e) => setEstimatedMinutes(parseInt(e.target.value, 10) || 15)}
-                className="w-full px-2 py-2 bg-[#101018] border-2 border-black text-white font-pixel text-[8px] outline-none"
+                className="w-full px-2 py-2 bg-[#101018] border-2 border-black text-white font-retro text-xs outline-none"
               />
             </div>
           </div>
@@ -227,9 +227,9 @@ export function CreateQuestModal({ isOpen, onClose, onQuestCreated }: CreateQues
             <button
               type="submit"
               disabled={loading}
-              className="pixel-btn pixel-btn-green flex-1 text-[9px] py-2.5"
+              className="pixel-btn pixel-btn-green flex-1 text-[9px] py-2.5 text-white"
             >
-              {loading ? "SCRIBING..." : "★ COMMIT TRIAL ★"}
+              {loading ? "SAVING..." : "★ SAVE TASK ★"}
             </button>
           </div>
         </form>

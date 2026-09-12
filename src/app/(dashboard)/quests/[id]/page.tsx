@@ -7,7 +7,6 @@ import {
   Shield,
   ArrowLeft,
   CheckCircle2,
-  Clock,
   Trash2,
   Save,
   Loader2,
@@ -21,6 +20,7 @@ import {
 import { useGame } from "@/components/providers/GameProvider";
 import { DomainQuest } from "@/server/repositories/types";
 import { formatDate } from "@/lib/utils";
+import { soundEngine } from "@/lib/sound";
 
 const ATTR_ICONS: Record<string, typeof BookOpen> = {
   INTELLECT: BookOpen,
@@ -53,7 +53,7 @@ export default function QuestDetailPage({ params }: { params: Promise<{ id: stri
       try {
         const res = await fetch(`/api/quests/${resolvedParams.id}`);
         if (!res.ok) {
-          setError("Quest not found.");
+          setError("Task not found.");
           return;
         }
         const json = await res.json();
@@ -64,7 +64,7 @@ export default function QuestDetailPage({ params }: { params: Promise<{ id: stri
           setEstimatedMinutes(json.data.estimatedMinutes || 30);
         }
       } catch {
-        setError("Failed to fetch quest details.");
+        setError("Failed to fetch task details.");
       } finally {
         setLoading(false);
       }
@@ -91,14 +91,15 @@ export default function QuestDetailPage({ params }: { params: Promise<{ id: stri
 
       const json = await res.json();
       if (!res.ok || !json.success) {
-        setError(json.error?.message || "Failed to update quest.");
+        setError(json.error?.message || "Failed to update task.");
         return;
       }
 
+      soundEngine.playCoin();
       setQuest(json.data);
-      setSuccessMsg("Quest updated successfully.");
+      setSuccessMsg("Task updated successfully.");
     } catch {
-      setError("Network error while updating quest.");
+      setError("Network error while updating task.");
     } finally {
       setSaving(false);
     }
@@ -107,6 +108,7 @@ export default function QuestDetailPage({ params }: { params: Promise<{ id: stri
   const handleComplete = async () => {
     if (!quest) return;
     setCompleting(true);
+    soundEngine.playCoin();
     const result = await completeQuestOptimistic(quest.id);
     if (result.success) {
       setQuest({ ...quest, status: quest.repeatType === "NONE" ? "COMPLETED" : quest.status, completedToday: true });
@@ -115,7 +117,7 @@ export default function QuestDetailPage({ params }: { params: Promise<{ id: stri
   };
 
   const handleDelete = async () => {
-    if (!confirm("Are you sure you wish to banish this quest?")) return;
+    if (!confirm("Are you sure you want to delete this task?")) return;
     try {
       const res = await fetch(`/api/quests/${resolvedParams.id}`, { method: "DELETE" });
       if (res.ok) {
@@ -130,7 +132,7 @@ export default function QuestDetailPage({ params }: { params: Promise<{ id: stri
     return (
       <div className="py-16 text-center text-slate-400">
         <Loader2 className="w-8 h-8 animate-spin mx-auto text-amber-500 mb-2" />
-        <p className="text-xs">Consulting the archives...</p>
+        <p className="text-xs font-retro">Loading task details...</p>
       </div>
     );
   }
@@ -139,16 +141,16 @@ export default function QuestDetailPage({ params }: { params: Promise<{ id: stri
     return (
       <div className="max-w-xl mx-auto py-16 text-center space-y-4">
         <Shield className="w-12 h-12 text-slate-600 mx-auto" />
-        <h2 className="text-xl font-bold text-white">Quest Not Found</h2>
-        <p className="text-sm text-slate-400">
-          This trial may have been archived or banished into the ether.
+        <h2 className="text-xl font-bold text-white font-pixel">Task Not Found</h2>
+        <p className="text-sm text-slate-400 font-retro">
+          This task may have been removed or deleted.
         </p>
         <Link
           href="/quests"
-          className="inline-flex items-center gap-2 text-xs font-bold text-amber-400 hover:underline"
+          className="inline-flex items-center gap-2 text-xs font-bold text-amber-400 hover:underline font-retro"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Return to Quest Journal</span>
+          <span>Return to Tasks</span>
         </Link>
       </div>
     );
@@ -161,18 +163,18 @@ export default function QuestDetailPage({ params }: { params: Promise<{ id: stri
     <div className="max-w-2xl mx-auto space-y-6">
       <Link
         href="/quests"
-        className="inline-flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-slate-200 transition-colors"
+        className="inline-flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-slate-200 transition-colors font-retro"
       >
         <ArrowLeft className="w-4 h-4" />
-        <span>Return to Quest Journal</span>
+        <span>Return to Tasks</span>
       </Link>
 
-      <div className="p-6 md:p-8 rounded-2xl bg-[#111827] border border-slate-800 shadow-xl space-y-6">
+      <div className="pixel-box p-6 md:p-8 bg-[#181824] border-2 border-slate-700 shadow-xl space-y-6">
         {/* Header Badges */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-800">
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b-2 border-slate-700">
           <div className="flex items-center gap-2 flex-wrap">
             <span
-              className={`text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded ${
+              className={`text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded font-pixel ${
                 quest.difficulty === "EASY"
                   ? "bg-emerald-500/15 text-emerald-400"
                   : quest.difficulty === "MEDIUM"
@@ -182,39 +184,39 @@ export default function QuestDetailPage({ params }: { params: Promise<{ id: stri
                   : "bg-purple-500/15 text-purple-400"
               }`}
             >
-              {quest.difficulty} Challenge
+              {quest.difficulty}
             </span>
 
-            <span className="flex items-center gap-1 text-xs text-slate-300 font-medium px-2.5 py-1 rounded bg-slate-800">
+            <span className="flex items-center gap-1 text-xs text-slate-300 font-medium px-2.5 py-1 rounded bg-slate-900 border border-slate-800 font-retro">
               <AttrIcon className="w-3.5 h-3.5 text-amber-400" />
               {quest.attributeType}
             </span>
 
-            <span className="text-xs text-slate-400 px-2.5 py-1 rounded bg-slate-800 font-mono">
-              {quest.repeatType === "DAILY" ? "Daily Habit" : quest.repeatType === "WEEKLY" ? "Weekly" : "One-Time"}
+            <span className="text-xs text-slate-400 px-2.5 py-1 rounded bg-slate-900 border border-slate-800 font-retro">
+              {quest.repeatType === "DAILY" ? "Daily Habit" : quest.repeatType === "WEEKLY" ? "Weekly Goal" : "One-Time Task"}
             </span>
           </div>
 
           <button
             onClick={handleDelete}
             className="p-2 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
-            title="Banish Quest"
+            title="Delete Task"
           >
             <Trash2 className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Completion Action Banner */}
-        <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+        {/* Completion Banner */}
+        <div className="p-4 rounded-xl bg-slate-900 border-2 border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
-            <div className="text-xs text-slate-400 uppercase font-semibold">Reward Guarantee</div>
-            <div className="text-sm font-mono text-white mt-0.5">
+            <div className="text-xs text-slate-400 uppercase font-semibold font-pixel text-[9px]">Rewards Upon Completion</div>
+            <div className="text-sm text-white mt-0.5 font-pixel">
               <span className="text-sky-400 font-bold">
                 +{quest.difficulty === "EASY" ? 25 : quest.difficulty === "MEDIUM" ? 50 : quest.difficulty === "HARD" ? 100 : 250} XP
               </span>
               {" • "}
               <span className="text-amber-400 font-bold">
-                +{quest.difficulty === "EASY" ? 15 : quest.difficulty === "MEDIUM" ? 35 : quest.difficulty === "HARD" ? 80 : 200} Gold
+                +{quest.difficulty === "EASY" ? 15 : quest.difficulty === "MEDIUM" ? 35 : quest.difficulty === "HARD" ? 80 : 200} Coins
               </span>
             </div>
           </div>
@@ -222,21 +224,21 @@ export default function QuestDetailPage({ params }: { params: Promise<{ id: stri
           <button
             onClick={handleComplete}
             disabled={isCompleted || completing}
-            className={`px-5 py-2.5 rounded-xl font-bold text-xs tracking-wide flex items-center gap-2 transition-all ${
+            className={`pixel-btn ${
               isCompleted
-                ? "bg-emerald-950/60 text-emerald-400 border border-emerald-800/60 cursor-default"
-                : "bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 text-slate-950 shadow-md shadow-amber-500/25 active:scale-95"
-            }`}
+                ? "pixel-btn-green cursor-default"
+                : "pixel-btn-yellow"
+            } text-[9px] py-2 px-4`}
           >
             {completing ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : isCompleted ? (
-              <>
+              <span className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4" />
-                <span>Trial Completed</span>
-              </>
+                <span>Completed</span>
+              </span>
             ) : (
-              <span>Fulfill Trial & Claim Rewards</span>
+              <span>Complete Task</span>
             )}
           </button>
         </div>
@@ -244,38 +246,38 @@ export default function QuestDetailPage({ params }: { params: Promise<{ id: stri
         {/* Edit Form */}
         <form onSubmit={handleSave} className="space-y-4 pt-2">
           {successMsg && (
-            <div className="p-3 rounded-lg bg-emerald-950/40 border border-emerald-800 text-emerald-300 text-xs">
+            <div className="p-3 bg-emerald-950/40 border-2 border-emerald-800 text-emerald-300 text-xs font-retro">
               {successMsg}
             </div>
           )}
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-              Quest Title
+            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5 font-retro">
+              Task Title
             </label>
             <input
               type="text"
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-100 text-sm focus:border-amber-500 outline-none"
+              className="w-full px-3.5 py-2.5 bg-slate-900 border-2 border-slate-800 text-slate-100 text-sm focus:border-amber-500 outline-none font-retro"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-              Description & Notes
+            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5 font-retro">
+              Notes & Details
             </label>
             <textarea
               rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-100 text-sm focus:border-amber-500 outline-none resize-none"
+              className="w-full px-3.5 py-2 bg-slate-900 border-2 border-slate-800 text-slate-100 text-sm focus:border-amber-500 outline-none resize-none font-retro"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5 font-retro">
               Estimated Duration (Minutes)
             </label>
             <input
@@ -284,7 +286,7 @@ export default function QuestDetailPage({ params }: { params: Promise<{ id: stri
               max={720}
               value={estimatedMinutes}
               onChange={(e) => setEstimatedMinutes(parseInt(e.target.value, 10) || 15)}
-              className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-100 text-sm focus:border-amber-500 outline-none"
+              className="w-full px-3.5 py-2 bg-slate-900 border-2 border-slate-800 text-slate-100 text-sm focus:border-amber-500 outline-none font-retro"
             />
           </div>
 
@@ -292,16 +294,16 @@ export default function QuestDetailPage({ params }: { params: Promise<{ id: stri
             <button
               type="submit"
               disabled={saving}
-              className="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs flex items-center gap-2 transition-colors disabled:opacity-50"
+              className="pixel-btn pixel-btn-green text-[9px] py-2 px-4 text-white flex items-center gap-2 disabled:opacity-50"
             >
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-              <span>Save Revisions</span>
+              <span>Save Changes</span>
             </button>
           </div>
         </form>
 
-        <div className="text-[11px] text-slate-500 pt-4 border-t border-slate-800">
-          Scribed on {formatDate(quest.createdAt)}
+        <div className="text-[11px] text-slate-500 pt-4 border-t-2 border-slate-800 font-retro">
+          Created on {formatDate(quest.createdAt)}
         </div>
       </div>
     </div>

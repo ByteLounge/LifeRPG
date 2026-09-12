@@ -6,11 +6,11 @@ import { usePathname } from "next/navigation";
 import { soundEngine } from "@/lib/sound";
 
 const MOBILE_ITEMS = [
-  { href: "/dashboard", label: "HUB", icon: "🗺️" },
-  { href: "/quests", label: "QUESTS", icon: "⚔️" },
-  { href: "/character", label: "HERO", icon: "🍄" },
+  { href: "/dashboard", label: "HOME", icon: "🏠" },
+  { href: "/quests", label: "TASKS", icon: "✅" },
+  { href: "/character", label: "PROFILE", icon: "🍄" },
   { href: "/inventory", label: "BAG", icon: "🎒" },
-  { href: "/shop", label: "SHOP", icon: "🏰" },
+  { href: "/shop", label: "SHOP", icon: "🏪" },
 ];
 
 export function MobileNav() {

@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Sparkles, Loader2, AlertCircle, Mail, KeyRound, User } from "lucide-react";
+import { Loader2, Mail, KeyRound, User } from "lucide-react";
 import { useGame } from "@/components/providers/GameProvider";
 import { soundEngine } from "@/lib/sound";
 
@@ -40,7 +40,7 @@ export default function SignupPage() {
       const json = await res.json();
       if (!res.ok || !json.success) {
         soundEngine.playPowerDown();
-        setError(json.error?.message || "Registration failed.");
+        setError(json.error?.message || "Registration failed. Please try again.");
         return;
       }
 
@@ -64,13 +64,13 @@ export default function SignupPage() {
             🍄
           </div>
           <div className="font-pixel text-[10px] text-yellow-400 tracking-wider">
-            ★ NEW GAME CARTRIDGE ★
+            ★ NEW ACCOUNT ★
           </div>
           <h2 className="font-pixel text-lg sm:text-xl text-white tracking-wide">
-            FORGE YOUR HERO
+            CREATE YOUR ACCOUNT
           </h2>
           <p className="font-retro text-xs text-slate-400">
-            Calibrate your real-world discipline into an 8-bit legend!
+            Start turning your daily habits and goals into a game!
           </p>
         </div>
 
@@ -84,7 +84,7 @@ export default function SignupPage() {
         <form onSubmit={handleSignup} className="space-y-4">
           <div>
             <label className="block font-pixel text-[9px] text-yellow-400 uppercase tracking-wider mb-2">
-              PLAYER 1 HANDLE
+              YOUR FULL NAME
             </label>
             <div className="relative">
               <User className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
@@ -96,7 +96,7 @@ export default function SignupPage() {
                   setDisplayName(e.target.value);
                   if (!characterName) setCharacterName(e.target.value);
                 }}
-                placeholder="Mario Mario"
+                placeholder="e.g. Alex Parker"
                 className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border-2 border-slate-700 text-white placeholder-slate-600 font-retro text-xs focus:border-yellow-400 outline-none"
               />
             </div>
@@ -104,7 +104,7 @@ export default function SignupPage() {
 
           <div>
             <label className="block font-pixel text-[9px] text-yellow-400 uppercase tracking-wider mb-2">
-              HERO TITLE / RPG MONIKER
+              CHARACTER NICKNAME
             </label>
             <div className="relative">
               <span className="text-sm absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500">⭐</span>
@@ -112,7 +112,7 @@ export default function SignupPage() {
                 type="text"
                 value={characterName}
                 onChange={(e) => setCharacterName(e.target.value)}
-                placeholder="Mario the Unyielding"
+                placeholder="e.g. Alex the Brave"
                 className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border-2 border-slate-700 text-white placeholder-slate-600 font-retro text-xs focus:border-yellow-400 outline-none"
               />
             </div>
@@ -120,7 +120,7 @@ export default function SignupPage() {
 
           <div>
             <label className="block font-pixel text-[9px] text-yellow-400 uppercase tracking-wider mb-2">
-              PLAYER EMAIL
+              EMAIL ADDRESS
             </label>
             <div className="relative">
               <Mail className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
@@ -129,7 +129,7 @@ export default function SignupPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="hero@liferpg.io"
+                placeholder="you@example.com"
                 className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border-2 border-slate-700 text-white placeholder-slate-600 font-retro text-xs focus:border-yellow-400 outline-none"
               />
             </div>
@@ -137,7 +137,7 @@ export default function SignupPage() {
 
           <div>
             <label className="block font-pixel text-[9px] text-yellow-400 uppercase tracking-wider mb-2">
-              SECRET PASSWORD (MIN 8 CHARACTERS)
+              PASSWORD (MIN 8 CHARACTERS)
             </label>
             <div className="relative">
               <KeyRound className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
@@ -158,14 +158,14 @@ export default function SignupPage() {
             disabled={loading}
             className="pixel-btn pixel-btn-yellow w-full py-3 text-slate-950 font-pixel text-xs tracking-wider flex items-center justify-center gap-2 disabled:opacity-50"
           >
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "CREATE HERO & START GAME"}
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "CREATE ACCOUNT"}
           </button>
         </form>
 
         <p className="text-center font-retro text-xs text-slate-400 mt-6">
-          Already have a saved game?{" "}
+          Already have an account?{" "}
           <Link href="/login" className="text-yellow-400 font-bold hover:underline">
-            Resume game
+            Log in
           </Link>
         </p>
       </div>

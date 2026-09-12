@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { Backpack, Sparkles, Check, Store, Shield, Tag } from "lucide-react";
 import { useGame } from "@/components/providers/GameProvider";
 import { DomainUserInventory } from "@/server/repositories/types";
 import { soundEngine } from "@/lib/sound";
@@ -74,30 +73,29 @@ export default function InventoryPage() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
-      {/* Header Banner - SMB3 Item Tray */}
+      {/* Header Banner */}
       <div className="pixel-box-gold p-4 md:p-6 text-slate-950 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="font-pixel text-[9px] bg-red-600 text-white px-2 py-0.5 border border-black">
-              SMB3 INVENTORY
+              YOUR BACKPACK
             </span>
-            <span className="font-pixel text-[9px] text-yellow-900">ITEM RESERVE TRAY</span>
           </div>
           <h1 className="font-pixel text-base sm:text-xl text-yellow-950 tracking-wider">
-            HERO BACKPACK & ITEMS
+            MY ITEMS & BACKPACK
           </h1>
           <p className="font-retro text-xs text-yellow-900 mt-1">
-            Manage your equipped badges, power titles, and Mushroom Kingdom realm themes!
+            Equip and manage the badges, avatar frames, and themes you have unlocked.
           </p>
         </div>
 
         <Link
           href="/shop"
           onClick={() => soundEngine.playJump()}
-          className="pixel-btn pixel-btn-red font-pixel text-[10px] px-4 py-2.5 flex items-center gap-2 shrink-0 self-start sm:self-auto"
+          className="pixel-btn pixel-btn-red font-pixel text-[10px] px-4 py-2.5 flex items-center gap-2 shrink-0 self-start sm:self-auto text-white"
         >
           <span>🏪</span>
-          <span>VISIT TOAD SHOP</span>
+          <span>VISIT ITEM SHOP</span>
         </Link>
       </div>
 
@@ -117,19 +115,19 @@ export default function InventoryPage() {
             }`}
           >
             {type === "ALL"
-              ? "★ ALL ITEMS"
+              ? "ALL ITEMS"
               : type === "AVATAR_FRAME"
-              ? "🖼️ FRAMES"
+              ? "FRAMES"
               : type === "TITLE"
-              ? "👑 TITLES"
+              ? "TITLES"
               : type === "THEME"
-              ? "🎨 REALMS"
-              : "⭐ BADGES"}
+              ? "THEMES"
+              : "BADGES"}
           </button>
         ))}
       </div>
 
-      {/* Items Grid (SMB3 Style Item Slots) */}
+      {/* Items Grid */}
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {[1, 2, 3].map((i) => (
@@ -141,10 +139,9 @@ export default function InventoryPage() {
           <div className="w-14 h-14 mx-auto question-block flex items-center justify-center font-pixel text-xl text-yellow-950">
             ?
           </div>
-          <h3 className="font-pixel text-sm text-yellow-400">ITEM RESERVE TRAY IS EMPTY!</h3>
+          <h3 className="font-pixel text-sm text-yellow-400">YOUR BACKPACK IS EMPTY!</h3>
           <p className="text-xs text-slate-400 max-w-sm mx-auto font-retro">
-            Acquire cosmetic badges, avatar frames, and honorary titles in Toad&apos;s Item Shop using your
-            earned gold coins.
+            Visit the Item Shop to buy cool frames, badges, and honorary titles with your earned coins.
           </p>
           <Link
             href="/shop"
@@ -152,7 +149,7 @@ export default function InventoryPage() {
             className="pixel-btn pixel-btn-yellow font-pixel text-[10px] px-4 py-2.5 inline-flex items-center gap-2"
           >
             <span>🪙</span>
-            <span>OPEN TOAD&apos;S SHOP</span>
+            <span>OPEN ITEM SHOP</span>
           </Link>
         </div>
       ) : (
@@ -211,7 +208,7 @@ export default function InventoryPage() {
                       : "pixel-btn-green text-white"
                   }`}
                 >
-                  {inv.isEquipped ? "UNEQUIP" : "EQUIP ITEM"}
+                  {inv.isEquipped ? "UNEQUIP" : "EQUIP"}
                 </button>
               </div>
             </div>

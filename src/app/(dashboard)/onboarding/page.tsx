@@ -3,64 +3,58 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useGame } from "@/components/providers/GameProvider";
-import { Sparkles, Shield, ArrowRight, Loader2, Dumbbell, BookOpen, Flame, Palette, Heart, Users } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { soundEngine } from "@/lib/sound";
 
 const ATTRIBUTES = [
   {
     id: "INTELLECT",
-    label: "Brain Power (Intellect)",
-    desc: "Study, coding logic, deep reading & problem solving",
+    label: "Intellect",
+    desc: "Study sessions, coding, deep reading & problem solving",
     icon: "🧠",
-    color: "border-blue-500 bg-blue-950/40 text-blue-300",
   },
   {
     id: "STRENGTH",
-    label: "Jump Attack (Strength)",
-    desc: "Fitness conditioning, workouts & physical fortitude",
+    label: "Strength",
+    desc: "Fitness conditioning, gym workouts & athletic training",
     icon: "💥",
-    color: "border-red-500 bg-red-950/40 text-red-300",
   },
   {
     id: "DISCIPLINE",
-    label: "Fire Flow (Discipline)",
-    desc: "Habit fire, unbroken daily streaks & waking early",
+    label: "Discipline",
+    desc: "Daily habits, unbroken streaks & waking up early",
     icon: "🔥",
-    color: "border-yellow-500 bg-yellow-950/40 text-yellow-300",
   },
   {
     id: "CREATIVITY",
-    label: "Star Spark (Creativity)",
-    desc: "Design, writing, art, engineering inventions",
+    label: "Creativity",
+    desc: "Writing, design, art, music & side projects",
     icon: "🎨",
-    color: "border-pink-500 bg-pink-950/40 text-pink-300",
   },
   {
     id: "VITALITY",
-    label: "Max HP (Vitality)",
-    desc: "Hydration, sleep discipline, nutrition & recovery",
+    label: "Vitality",
+    desc: "Hydration, sleep routines, nutrition & recovery",
     icon: "❤️",
-    color: "border-emerald-500 bg-emerald-950/40 text-emerald-300",
   },
   {
     id: "SOCIAL",
-    label: "Bros Bond (Social)",
-    desc: "Networking, leadership, mentoring & multiplayer teamwork",
+    label: "Social",
+    desc: "Friends, family, mentoring & teamwork",
     icon: "🤝",
-    color: "border-orange-500 bg-orange-950/40 text-orange-300",
   },
 ];
 
 const THEMES = [
-  { id: "dark", label: "ARCANE OBSIDIAN", desc: "Dark realm with glowing 8-bit neon pixel accents" },
-  { id: "light", label: "SOLAR PARCHMENT", desc: "Crisp bright overworld parchment with amber accents" },
+  { id: "dark", label: "DARK THEME", desc: "Classic dark arcade mode with neon colors" },
+  { id: "light", label: "LIGHT THEME", desc: "Bright daytime overworld screen style" },
 ];
 
 export default function OnboardingPage() {
   const router = useRouter();
   const { character, refreshGameData, setTheme } = useGame();
 
-  const [charName, setCharName] = useState(character?.name || "Jumpman the Brave");
+  const [charName, setCharName] = useState(character?.name || "Player 1");
   const [selectedAttr, setSelectedAttr] = useState("DISCIPLINE");
   const [selectedTheme, setSelectedTheme] = useState("dark");
   const [submitting, setSubmitting] = useState(false);
@@ -103,20 +97,20 @@ export default function OnboardingPage() {
             ?
           </div>
           <div className="font-pixel text-[10px] text-yellow-400 tracking-wider">
-            ★ WORLD 1-1 CHARACTER PROLOGUE ★
+            ★ WELCOME TO LIFE RPG ★
           </div>
           <h2 className="font-pixel text-lg sm:text-xl text-white tracking-wide">
-            CALIBRATE YOUR HERO
+            SET UP YOUR PROFILE
           </h2>
           <p className="font-retro text-xs text-slate-400 max-w-md mx-auto">
-            Choose your primary attribute focus to unlock a starter XP bonus and calibrate trial rewards!
+            Pick your primary focus skill to get +25 bonus starter XP and choose your preferred screen theme.
           </p>
         </div>
 
         {/* Character Title */}
         <div className="space-y-2">
           <label className="block font-pixel text-[9px] text-yellow-400 uppercase tracking-wider">
-            HERO TITLE / RPG MONIKER
+            YOUR CHARACTER NICKNAME
           </label>
           <div className="relative">
             <span className="text-sm absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500">⭐</span>
@@ -124,7 +118,7 @@ export default function OnboardingPage() {
               type="text"
               value={charName}
               onChange={(e) => setCharName(e.target.value)}
-              placeholder="e.g. Jumpman the Brave"
+              placeholder="e.g. Alex the Brave"
               className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border-2 border-slate-700 text-white placeholder-slate-600 font-retro text-xs focus:border-yellow-400 outline-none"
             />
           </div>
@@ -133,7 +127,7 @@ export default function OnboardingPage() {
         {/* Core Focus Attribute */}
         <div className="space-y-3">
           <label className="block font-pixel text-[9px] text-yellow-400 uppercase tracking-wider">
-            PRIMARY POWER ATTRIBUTE (+25 STARTER XP BONUS)
+            STARTING FOCUS SKILL (+25 BONUS STARTER XP)
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {ATTRIBUTES.map((attr) => {
@@ -167,7 +161,7 @@ export default function OnboardingPage() {
         {/* Realm Theme */}
         <div className="space-y-3">
           <label className="block font-pixel text-[9px] text-yellow-400 uppercase tracking-wider">
-            PREFERRED REALM PALETTE
+            PREFERRED SCREEN THEME
           </label>
           <div className="grid grid-cols-2 gap-3">
             {THEMES.map((theme) => {
@@ -205,7 +199,7 @@ export default function OnboardingPage() {
             <Loader2 className="w-5 h-5 animate-spin" />
           ) : (
             <>
-              <span>★ COMMENCE HEROIC QUEST (WORLD 1-1) ★</span>
+              <span>★ GET STARTED (GO TO DASHBOARD) ★</span>
               <ArrowRight className="w-4 h-4" />
             </>
           )}
