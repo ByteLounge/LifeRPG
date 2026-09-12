@@ -1,0 +1,242 @@
+// Life RPG Database Schema
+// Optimized for PostgreSQL / Supabase with strict relational integrity and ledger immutability
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  passwordHash String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  profile      Profile?
+  character    Character?
+  streak       Streak?
+  quests       Quest[]
+  completions  QuestCompletion[]
+  xpLedger     XpTransaction[]
+  goldLedger   CurrencyTransaction[]
+  inventory    UserInventory[]
+  purchases    Purchase[]
+  achievements UserAchievement[]
+
+  @@map("users")
+}
+
+model Profile {
+  id           String   @id @default(uuid())
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  displayName  String
+  avatar       String   @default("hero-warrior")
+  timezone     String   @default("UTC")
+  soundEnabled Boolean  @default(true)
+  theme        String   @default("dark")
+  onboarded    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("profiles")
+}
+
+model Character {
+  id               String      @id @default(uuid())
+  userId           String      @unique
+  user             User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name             String
+  level            Int         @default(1)
+  totalXp          Int         @default(0)
+  gold             Int         @default(100)
+  equippedTitleId  String?
+  equippedFrameId  String?
+  equippedThemeId  String?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  attributes       Attribute[]
+
+  @@map("characters")
+}
+
+model Attribute {
+  id          String    @id @default(uuid())
+  characterId String
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  type        String    // STRENGTH, INTELLECT, DISCIPLINE, CREATIVITY, VITALITY, SOCIAL
+  currentXp   Int       @default(0)
+  level       Int       @default(1)
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([characterId, type])
+  @@map("attributes")
+}
+
+model QuestCategory {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  icon      String
+  color     String
+  isDefault Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@map("quest_categories")
+}
+
+model Quest {
+  id               String            @id @default(uuid())
+  userId           String
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title            String
+  description      String?
+  category         String            @default("General")
+  difficulty       String            @default("MEDIUM") // EASY, MEDIUM, HARD, EPIC
+  attributeType    String            @default("DISCIPLINE")
+  estimatedMinutes Int               @default(30)
+  repeatType       String            @default("NONE") // NONE, DAILY, WEEKLY
+  dueDate          DateTime?
+  status           String            @default("ACTIVE") // ACTIVE, COMPLETED, ARCHIVED
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  completions      QuestCompletion[]
+
+  @@index([userId, status])
+  @@map("quests")
+}
+
+model QuestCompletion {
+  id                String   @id @default(uuid())
+  questId           String
+  quest             Quest    @relation(fields: [questId], references: [id], onDelete: Cascade)
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  xpEarned          Int
+  goldEarned        Int
+  attributeXpEarned Int
+  completionDate    String   // YYYY-MM-DD
+  completedAt       DateTime @default(now())
+  idempotencyKey    String?  @unique
+
+  @@index([userId, completionDate])
+  @@map("quest_completions")
+}
+
+model XpTransaction {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount     Int
+  sourceType String   // QUEST_COMPLETION, ACHIEVEMENT, BONUS
+  sourceId   String?
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@map("xp_transactions")
+}
+
+model CurrencyTransaction {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount      Int
+  type        String   // CREDIT, DEBIT
+  source      String   // QUEST_COMPLETION, SHOP_PURCHASE, ACHIEVEMENT
+  referenceId String?
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@map("currency_transactions")
+}
+
+model Streak {
+  id             String   @id @default(uuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  currentStreak  Int      @default(0)
+  longestStreak  Int      @default(0)
+  lastActiveDate String?  // YYYY-MM-DD
+  updatedAt      DateTime @updatedAt
+
+  @@map("streaks")
+}
+
+model ShopItem {
+  id          String          @id @default(uuid())
+  name        String
+  description String
+  type        String          // AVATAR_FRAME, THEME, TITLE, BADGE
+  price       Int
+  icon        String
+  rarity      String          @default("COMMON") // COMMON, RARE, EPIC, LEGENDARY
+  itemValue   String
+  isAvailable Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+
+  inventory   UserInventory[]
+  purchases   Purchase[]
+
+  @@map("shop_items")
+}
+
+model UserInventory {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  itemId     String
+  item       ShopItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  isEquipped Boolean  @default(false)
+  acquiredAt DateTime @default(now())
+
+  @@unique([userId, itemId])
+  @@index([userId])
+  @@map("user_inventory")
+}
+
+model Purchase {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  itemId    String
+  item      ShopItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  pricePaid Int
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("purchases")
+}
+
+model Achievement {
+  id          String            @id @default(uuid())
+  code        String            @unique
+  name        String
+  description String
+  icon        String
+  rewardXp    Int
+  rewardGold  Int
+  createdAt   DateTime          @default(now())
+
+  unlocks     UserAchievement[]
+
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id            String      @id @default(uuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievementId String
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  unlockedAt    DateTime    @default(now())
+
+  @@unique([userId, achievementId])
+  @@index([userId])
+  @@map("user_achievements")
+}
