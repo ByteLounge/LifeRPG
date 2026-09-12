@@ -4,9 +4,9 @@ import { gameRepository } from "@/server/repositories/gameRepository";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    const session = await requireAuth();
+    const session = await requireAuth(req);
     const inventory = await gameRepository.getUserInventory(session.userId);
     const charData = await gameRepository.getCharacter(session.userId);
 

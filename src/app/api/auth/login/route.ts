@@ -5,6 +5,8 @@ import { verifyPassword } from "@/lib/auth/password";
 import { createSessionToken } from "@/lib/auth/jwt";
 import { SESSION_COOKIE_NAME } from "@/lib/auth/session";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();

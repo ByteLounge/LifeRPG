@@ -1,8 +1,9 @@
 import { SignJWT, jwtVerify } from "jose";
+import { TextEncoder } from "node:util";
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || "liferpg_development_secret_key_minimum_32_chars_123456789"
-);
+const encoder = new TextEncoder();
+const JWT_SECRET_STRING = process.env.JWT_SECRET || "liferpg_development_secret_key_minimum_32_chars_123456789";
+const JWT_SECRET = encoder.encode(JWT_SECRET_STRING);
 
 export interface TokenPayload {
   userId: string;
@@ -10,6 +11,7 @@ export interface TokenPayload {
 }
 
 export async function createSessionToken(payload: TokenPayload): Promise<string> {
+  const encodedPayload = encoder.encode(JSON.stringify({ ...payload }));
   return new SignJWT({ ...payload })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()

@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
   try {
-    const session = await requireAuth();
+    const session = await requireAuth(req);
     const { searchParams } = new URL(req.url);
     const status = searchParams.get("status") || undefined;
     const category = searchParams.get("category") || undefined;
@@ -29,7 +29,7 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const session = await requireAuth();
+    const session = await requireAuth(req);
     const body = await req.json();
 
     const validated = CreateQuestSchema.safeParse(body);

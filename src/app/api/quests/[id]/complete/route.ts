@@ -10,7 +10,7 @@ export async function POST(
 ) {
   const params = await props.params;
   try {
-    const session = await requireAuth();
+    const session = await requireAuth(req);
     let idempotencyKey: string | undefined;
 
     try {

@@ -4,9 +4,9 @@ import { gameRepository } from "@/server/repositories/gameRepository";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    const session = await getSessionUser();
+    const session = await getSessionUser(req);
     if (!session) {
       return NextResponse.json(
         { success: false, error: { code: "UNAUTHORIZED", message: "Not authenticated" } },
