@@ -1,10 +1,19 @@
 "use client";
 
 import React from "react";
-import { useGame } from "@/components/providers/GameProvider";
+import { useGame, AttributeState } from "@/components/providers/GameProvider";
 import { getAttributeLevelFromXP } from "@/lib/game-engine/progression";
 import { formatNumber } from "@/lib/utils";
 import { soundEngine } from "@/lib/sound";
+
+const DEFAULT_ATTRIBUTES: AttributeState[] = [
+  { id: "attr_intellect", type: "INTELLECT", currentXp: 0, level: 1 },
+  { id: "attr_strength", type: "STRENGTH", currentXp: 0, level: 1 },
+  { id: "attr_discipline", type: "DISCIPLINE", currentXp: 0, level: 1 },
+  { id: "attr_creativity", type: "CREATIVITY", currentXp: 0, level: 1 },
+  { id: "attr_vitality", type: "VITALITY", currentXp: 0, level: 1 },
+  { id: "attr_social", type: "SOCIAL", currentXp: 0, level: 1 },
+];
 
 const ATTR_METADATA: Record<
   string,
@@ -57,8 +66,6 @@ const ATTR_METADATA: Record<
 export default function CharacterPage() {
   const { character, profile, attributes, streak, xpProgress } = useGame();
 
-  if (!character) return null;
-
   const handleHeroJump = () => {
     soundEngine.playJump();
   };
@@ -66,6 +73,19 @@ export default function CharacterPage() {
   const handlePowerUpAudio = () => {
     soundEngine.playPowerUp();
   };
+
+  if (!character) {
+    return (
+      <div className="max-w-5xl mx-auto py-16 text-center space-y-4">
+        <div className="w-16 h-16 mx-auto question-block flex items-center justify-center font-pixel text-2xl text-yellow-950 animate-bounce">
+          ?
+        </div>
+        <p className="font-pixel text-xs text-yellow-400">LOADING PROFILE & SKILLS...</p>
+      </div>
+    );
+  }
+
+  const displayAttributes = attributes && attributes.length > 0 ? attributes : DEFAULT_ATTRIBUTES;
 
   return (
     <div className="max-w-5xl mx-auto space-y-8">
@@ -182,7 +202,7 @@ export default function CharacterPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {attributes.map((attr) => {
+          {displayAttributes.map((attr) => {
             const meta = ATTR_METADATA[attr.type] || ATTR_METADATA.DISCIPLINE;
             const calc = getAttributeLevelFromXP(attr.currentXp);
 

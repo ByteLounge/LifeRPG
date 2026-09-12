@@ -62,24 +62,38 @@ class MemoryGameStore {
   }
 }
 
-const memoryStore = new MemoryGameStore();
+const globalForGame = globalThis as unknown as {
+  memoryStore?: MemoryGameStore;
+  isPrismaAvailable?: boolean;
+};
+
+if (!globalForGame.memoryStore) {
+  globalForGame.memoryStore = new MemoryGameStore();
+}
+const memoryStore = globalForGame.memoryStore;
 
 /**
  * Checks if Prisma can connect to a live PostgreSQL database.
+ * Caches result on globalThis so zero-config demo mode runs instantly with 0ms overhead.
  */
-let isPrismaAvailable: boolean | null = null;
 async function checkPrisma(): Promise<boolean> {
-  if (isPrismaAvailable !== null) return isPrismaAvailable;
+  if (globalForGame.isPrismaAvailable !== undefined) {
+    return globalForGame.isPrismaAvailable;
+  }
+  if (!process.env.DATABASE_URL) {
+    globalForGame.isPrismaAvailable = false;
+    return false;
+  }
   try {
-    // Quick probe with timeout
+    // Quick probe with a 150ms timeout
     await Promise.race([
       prisma.$queryRaw`SELECT 1`,
-      new Promise((_, reject) => setTimeout(() => reject(new Error("DB Timeout")), 1500)),
+      new Promise((_, reject) => setTimeout(() => reject(new Error("DB Timeout")), 150)),
     ]);
-    isPrismaAvailable = true;
+    globalForGame.isPrismaAvailable = true;
     return true;
   } catch {
-    isPrismaAvailable = false;
+    globalForGame.isPrismaAvailable = false;
     return false;
   }
 }
@@ -369,7 +383,17 @@ export class GameRepository implements IGameRepository {
 
     const c = memoryStore.characters.get(userId);
     if (!c) return null;
-    const attrs = memoryStore.attributes.get(c.id) || [];
+    let attrs = memoryStore.attributes.get(c.id);
+    if (!attrs || attrs.length === 0) {
+      attrs = ALL_ATTRIBUTES.map((type) => ({
+        id: `attr_${type.toLowerCase()}_${c.id}`,
+        characterId: c.id,
+        type,
+        currentXp: 0,
+        level: 1,
+      }));
+      memoryStore.attributes.set(c.id, attrs);
+    }
     return { character: { ...c }, attributes: attrs.map((a) => ({ ...a })) };
   }
 

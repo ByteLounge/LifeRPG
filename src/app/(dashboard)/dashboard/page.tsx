@@ -318,7 +318,17 @@ export default function DashboardPage() {
             </div>
 
             <div className="space-y-3">
-              {attributes.map((attr) => {
+              {(attributes && attributes.length > 0
+                ? attributes
+                : [
+                    { id: "attr_intellect", type: "INTELLECT" as const, currentXp: 0, level: 1 },
+                    { id: "attr_strength", type: "STRENGTH" as const, currentXp: 0, level: 1 },
+                    { id: "attr_discipline", type: "DISCIPLINE" as const, currentXp: 0, level: 1 },
+                    { id: "attr_creativity", type: "CREATIVITY" as const, currentXp: 0, level: 1 },
+                    { id: "attr_vitality", type: "VITALITY" as const, currentXp: 0, level: 1 },
+                    { id: "attr_social", type: "SOCIAL" as const, currentXp: 0, level: 1 },
+                  ]
+              ).map((attr) => {
                 const info = ATTR_INFO[attr.type] || { label: attr.type, icon: "🍄" };
                 const calc = getAttributeLevelFromXP(attr.currentXp);
 
