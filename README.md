@@ -517,24 +517,107 @@ npm run build
 
 ## 13. Production Deployment Guide
 
-### Deploying on Vercel + Supabase (Recommended)
+Life RPG is architected for zero-hassle, high-performance deployment on **Vercel** (serverless hosting) paired with **Supabase** (managed PostgreSQL database & persistent storage).
 
-1. **Database Setup (Supabase)**:
-   - Create a free project at [supabase.com](https://supabase.com).
-   - Go to **Project Settings** → **Database** → **Connection String** (use Node.js / pooled port `6543`).
-2. **Push Database Schema & Seed**:
-   ```bash
-   DATABASE_URL="your-supabase-connection-string" npx prisma db push
-   DATABASE_URL="your-supabase-connection-string" npx tsx prisma/seed.ts
-   ```
-3. **Deploy on Vercel**:
-   - Push your repository to GitHub.
-   - Import the project into [Vercel](https://vercel.com).
-   - In **Environment Variables**, set:
-     - `DATABASE_URL`: Your Supabase connection string.
-     - `JWT_SECRET`: A secure 64-character random string.
-     - `DEMO_STORAGE_FALLBACK`: Set to `"false"` in production.
-   - Click **Deploy**!
+### 13.1 Supabase Database & Auth Setup
+
+Supabase provides the managed PostgreSQL database and persistence layer for all player data, task ledgers, transactions, and authentication records.
+
+#### 1. Create a Supabase Project
+1. Log in to [supabase.com](https://supabase.com) and click **"New Project"**.
+2. Name your project (e.g. `LifeRPG`), choose an AWS region closest to your users, and set a strong database password.
+3. Keep your database password handy.
+
+#### 2. Obtain Your Connection String
+In the modern Supabase dashboard:
+1. Click the **"Connect"** button in the top navigation bar (next to your project name).
+2. Go to the **"ORMs"** tab and select **"Prisma"** (or click the **"URI"** tab).
+3. Choose the appropriate connection mode:
+
+| Mode | Port | URL Format | Best Used For |
+|---|:---:|---|---|
+| **Transaction Pooler** *(Recommended)* | `6543` | `postgresql://postgres.[REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres?pgbouncer=true` | **Vercel serverless functions**, Next.js API routes, high concurrency |
+| **Session Pooler** | `5432` | `postgresql://postgres.[REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres` | Running migrations, seeds, or local tools without IPv6 |
+| **Direct Connection** | `5432` | `postgresql://postgres:[PASSWORD]@db.[REF].supabase.co:5432/postgres` | Dedicated servers or local networks with native IPv6 support |
+
+> [!TIP]
+> If your local network or ISP does not support IPv6, the **Transaction Pooler** (port `6543`) or **Session Pooler** (port `5432`) on `aws-0-[REGION].pooler.supabase.com` routes over IPv4 and connects seamlessly from any machine.
+
+#### 3. Push Database Schema & Seed Data
+Run these commands from your local project terminal (substituting your Supabase connection string):
+
+```bash
+# Push all 11 database tables, relations, and unique constraints to Supabase:
+$env:DATABASE_URL="postgresql://postgres.[REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres"; npx prisma db push
+
+# Seed the 6 default quest categories, 14 shop items, and 10 achievements:
+$env:DATABASE_URL="postgresql://postgres.[REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres"; npm run db:seed
+```
+
+*(On Linux / macOS bash, omit `$env:` and prefix `DATABASE_URL="..."` before each command).*
+
+#### 4. Verify in Supabase Table Editor
+Open your Supabase project in the browser and click **"Table Editor"** (grid icon on the left sidebar). You will see:
+- `quest_categories` (6 default categories seeded)
+- `shop_items` (14 titles, frames, and themes seeded)
+- `achievements` (10 milestones seeded)
+- `users`, `profiles`, `characters`, `attributes`, `streaks`, etc. ready for live players!
+
+---
+
+### 13.2 Vercel Deployment Walkthrough
+
+#### 1. Push Your Repository to GitHub
+Ensure your latest changes are pushed to your GitHub repository:
+```bash
+git add .
+git commit -m "feat: complete production ready Life RPG"
+git push origin main
+```
+
+#### 2. Import into Vercel
+1. Log in to [vercel.com](https://vercel.com).
+2. Click **"Add New..."** $\to$ **"Project"**.
+3. Select your GitHub repository (`LifeRPG`).
+4. Vercel will automatically detect **Next.js** as the Framework Preset.
+
+#### 3. Configure Production Environment Variables
+Under the **"Environment Variables"** dropdown, add the following variables:
+
+| Variable Name | Example Value | Description |
+|---|---|---|
+| `DATABASE_URL` | `postgresql://postgres.[REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres?pgbouncer=true` | Supabase pooled connection string (port 6543 with `?pgbouncer=true`) |
+| `JWT_SECRET` | `liferpg_prod_jwt_secret_minimum_32_characters_long_987654321` | Cryptographic secret for signing HTTP-only session cookies |
+| `NEXT_PUBLIC_APP_URL` | `https://your-app-name.vercel.app` | Production domain for canonical callbacks and redirects |
+| `DEMO_STORAGE_FALLBACK` | `false` | Disables mock store to guarantee all data is written to Supabase |
+
+#### 4. Automated Build & Deploy
+Click **"Deploy"**.
+- Vercel automatically runs `postinstall: prisma generate` during dependency installation, ensuring the correct Linux OpenSSL Prisma binary is built.
+- The Next.js 15 production build compiles in ~45 seconds.
+- Your app is assigned a live production URL (e.g. `https://liferpg.vercel.app`) with edge caching and global CDN distribution.
+
+---
+
+### 13.3 Production Verification Checklist
+
+Once deployed to Vercel, verify end-to-end functionality:
+1. **User Sign Up**: Visit `/signup` on your live Vercel URL and create a new account.
+2. **Database Verification**: Check your Supabase **Table Editor** $\to$ `users`, `profiles`, `characters`, `attributes`. Your new user record will appear immediately.
+3. **Task Completion**: Check off a starter task. Listen for the Web Audio chiptune coin ding, watch your XP and Coins increment, and notice your streak flame activate.
+4. **Item Shop Purchase**: Visit `/shop`, buy an avatar frame or title, and equip it in `/inventory`.
+5. **Session Persistence**: Refresh the browser (`Ctrl+F5`) or log out and log back in. Your full RPG state rehydrates cleanly from Supabase.
+
+---
+
+### 13.4 Common Deployment Troubleshooting
+
+- **Prisma Client Missing on Vercel**: 
+  Life RPG includes `"postinstall": "prisma generate"` in `package.json`. If you ever override the build command in Vercel, ensure it runs `prisma generate && next build`.
+- **Special Characters in Database Password**:
+  If your Supabase password contains special characters (like `@`, `#`, `$`, `%`), ensure they are URL-encoded in the `DATABASE_URL` (e.g. `@` becomes `%40`).
+- **Connection Limits / Serverless Exhaustion**:
+  Always use the **Transaction Pooler (port `6543`)** with `?pgbouncer=true` on Vercel to allow thousands of concurrent serverless invocations without exhausting PostgreSQL connection limits.
 
 ---
 
