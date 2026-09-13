@@ -84,15 +84,23 @@ async function checkPrisma(): Promise<boolean> {
     globalForGame.isPrismaAvailable = false;
     return false;
   }
+
+  // Allow adequate time for remote SSL handshakes (e.g. Supabase), but fast-fail on missing local postgres
+  const dbUrl = process.env.DATABASE_URL;
+  const isLocalhost = dbUrl.includes("localhost") || dbUrl.includes("127.0.0.1");
+  const timeoutMs = isLocalhost ? 200 : 5000;
+
   try {
-    // Quick probe with a 150ms timeout
     await Promise.race([
       prisma.$queryRaw`SELECT 1`,
-      new Promise((_, reject) => setTimeout(() => reject(new Error("DB Timeout")), 150)),
+      new Promise((_, reject) => setTimeout(() => reject(new Error("DB Timeout")), timeoutMs)),
     ]);
     globalForGame.isPrismaAvailable = true;
     return true;
-  } catch {
+  } catch (err) {
+    if (!isLocalhost || process.env.NODE_ENV === "production") {
+      console.warn("Could not reach database via DATABASE_URL:", (err as Error)?.message || err);
+    }
     globalForGame.isPrismaAvailable = false;
     return false;
   }
