@@ -80,7 +80,7 @@ async function checkPrisma(): Promise<boolean> {
   if (globalForGame.isPrismaAvailable !== undefined) {
     return globalForGame.isPrismaAvailable;
   }
-  if (!process.env.DATABASE_URL) {
+  if (!process.env.DATABASE_URL || process.env.NODE_ENV === "test" || process.env.DEMO_STORAGE_FALLBACK === "true") {
     globalForGame.isPrismaAvailable = false;
     return false;
   }
