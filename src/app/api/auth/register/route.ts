@@ -4,6 +4,7 @@ import { gameRepository } from "@/server/repositories/gameRepository";
 import { hashPassword } from "@/lib/auth/password";
 import { createSessionToken } from "@/lib/auth/jwt";
 import { SESSION_COOKIE_NAME } from "@/lib/auth/session";
+import { getSupabaseAdminClient, getSupabaseClient } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 
@@ -41,8 +42,57 @@ export async function POST(req: Request) {
       );
     }
 
+    // Register with Supabase Auth if Supabase keys are configured
+    let supabaseUserId: string | undefined;
+    const adminClient = getSupabaseAdminClient();
+    const anonClient = getSupabaseClient();
+
+    if (adminClient) {
+      const { data: supaUser, error: supaError } = await adminClient.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+        user_metadata: { displayName, characterName },
+      });
+      if (supaError) {
+        if (supaError.message.toLowerCase().includes("already registered") || supaError.status === 422) {
+          return NextResponse.json(
+            { success: false, error: { code: "EMAIL_ALREADY_EXISTS", message: "An account with this email address already exists in Supabase." } },
+            { status: 409 }
+          );
+        }
+        return NextResponse.json(
+          { success: false, error: { code: "SUPABASE_AUTH_ERROR", message: supaError.message } },
+          { status: 400 }
+        );
+      }
+      supabaseUserId = supaUser.user?.id;
+    } else if (anonClient) {
+      const { data: supaData, error: supaError } = await anonClient.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { displayName, characterName },
+        },
+      });
+      if (supaError) {
+        if (supaError.message.toLowerCase().includes("already registered") || supaError.status === 422) {
+          return NextResponse.json(
+            { success: false, error: { code: "EMAIL_ALREADY_EXISTS", message: "An account with this email address already exists in Supabase." } },
+            { status: 409 }
+          );
+        }
+        return NextResponse.json(
+          { success: false, error: { code: "SUPABASE_AUTH_ERROR", message: supaError.message } },
+          { status: 400 }
+        );
+      }
+      supabaseUserId = supaData.user?.id;
+    }
+
     const passwordHash = await hashPassword(password);
     const { user, profile, character } = await gameRepository.createUser({
+      id: supabaseUserId,
       email,
       passwordHash,
       displayName,

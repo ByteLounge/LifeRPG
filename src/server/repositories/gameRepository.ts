@@ -132,13 +132,14 @@ export class GameRepository implements IGameRepository {
   }
 
   async createUser(params: {
+    id?: string;
     email: string;
     passwordHash: string;
     displayName: string;
     characterName?: string;
     timezone?: string;
   }): Promise<{ user: DomainUser; profile: DomainProfile; character: DomainCharacter }> {
-    const userId = `usr_${Math.random().toString(36).substring(2, 11)}`;
+    const userId = params.id || `usr_${Math.random().toString(36).substring(2, 11)}`;
     const profileId = `prf_${Math.random().toString(36).substring(2, 11)}`;
     const characterId = `chr_${Math.random().toString(36).substring(2, 11)}`;
     const streakId = `stk_${Math.random().toString(36).substring(2, 11)}`;
@@ -149,6 +150,7 @@ export class GameRepository implements IGameRepository {
     if (usePrisma) {
       const created = await prisma.user.create({
         data: {
+          id: params.id || undefined,
           email: params.email.toLowerCase(),
           passwordHash: params.passwordHash,
           profile: {

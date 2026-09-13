@@ -142,6 +142,7 @@ export interface IGameRepository {
   findUserByEmail(email: string): Promise<DomainUser | null>;
   findUserById(id: string): Promise<DomainUser | null>;
   createUser(params: {
+    id?: string;
     email: string;
     passwordHash: string;
     displayName: string;

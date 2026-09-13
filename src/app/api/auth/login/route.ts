@@ -4,6 +4,7 @@ import { gameRepository } from "@/server/repositories/gameRepository";
 import { verifyPassword } from "@/lib/auth/password";
 import { createSessionToken } from "@/lib/auth/jwt";
 import { SESSION_COOKIE_NAME } from "@/lib/auth/session";
+import { getSupabaseClient } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 
@@ -26,6 +27,28 @@ export async function POST(req: Request) {
     }
 
     const { email, password } = validated.data;
+
+    // Verify credentials via Supabase Auth when Supabase is configured
+    const anonClient = getSupabaseClient();
+    if (anonClient) {
+      const { error: supaError } = await anonClient.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (supaError) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: {
+              code: "INVALID_CREDENTIALS",
+              message: supaError.message || "Invalid email or password combination.",
+            },
+          },
+          { status: 401 }
+        );
+      }
+    }
+
     const user = await gameRepository.findUserByEmail(email);
 
     if (!user) {
@@ -41,18 +64,20 @@ export async function POST(req: Request) {
       );
     }
 
-    const isValid = await verifyPassword(password, user.passwordHash);
-    if (!isValid) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: {
-            code: "INVALID_CREDENTIALS",
-            message: "Invalid email or password combination.",
+    if (!anonClient) {
+      const isValid = await verifyPassword(password, user.passwordHash);
+      if (!isValid) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: {
+              code: "INVALID_CREDENTIALS",
+              message: "Invalid email or password combination.",
+            },
           },
-        },
-        { status: 401 }
-      );
+          { status: 401 }
+        );
+      }
     }
 
     const token = await createSessionToken({
